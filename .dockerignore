@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+db.sqlite3
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+.git/
+.gitignore
+.vscode/
+pgadmin/
+backup_mysql.json
+MIGRACION_POSTGRES.md
+proyectos_grado_postgres.sql
