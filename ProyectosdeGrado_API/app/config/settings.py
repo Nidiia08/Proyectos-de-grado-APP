@@ -3,11 +3,12 @@
 from datetime import timedelta
 from pathlib import Path
 
-from decouple import config
+from decouple import AutoConfig
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+config = AutoConfig(search_path=BASE_DIR.parent)
 
-SECRET_KEY = config("SECRET_KEY", default="cambiar-esta-clave")
+SECRET_KEY = config("SECRET_KEY", default="") or "cambiar-esta-clave"
 DEBUG = config("DEBUG", default=True, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
 
@@ -87,6 +88,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 

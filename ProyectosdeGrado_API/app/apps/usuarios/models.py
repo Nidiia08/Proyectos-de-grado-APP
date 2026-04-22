@@ -89,7 +89,7 @@ class UsuarioRol(models.Model):
 
     class Meta:
         managed = True
-        db_table = "USUARIO_ROL"
+        db_table = "usuario_rol"
         unique_together = ("usuario", "rol")
 
     def __str__(self):

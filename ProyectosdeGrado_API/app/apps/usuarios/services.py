@@ -6,18 +6,21 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Docente, Estudiante, Usuario, UsuarioRol
 
 
-def autenticar_usuario(correo: str, password: str) -> dict[str, Any]:
-    """Valida credenciales y retorna tokens JWT."""
+def autenticar_usuario(correo: str, password: str, rol: str) -> dict[str, Any]:
+    """Valida credenciales, rol solicitado y retorna tokens JWT."""
     usuario = Usuario.objects.filter(correo=correo).first()
     if not usuario or not usuario.check_password(password):
-        raise ValueError("Credenciales invalidas.")
+        raise ValueError("Credenciales incorrectas")
     if not usuario.activo:
-        raise ValueError("El usuario esta inactivo.")
+        raise ValueError("Usuario inactivo, contacte al Comite Curricular")
+    if not usuario.tiene_rol(rol):
+        raise ValueError(f"No tienes acceso como {rol}")
 
     refresh = RefreshToken.for_user(usuario)
     return {
-        "access_token": str(refresh.access_token),
-        "refresh_token": str(refresh),
+        "access": str(refresh.access_token),
+        "refresh": str(refresh),
+        "rol_sesion": rol,
         "usuario": {
             "id": usuario.id,
             "nombre": usuario.nombre,

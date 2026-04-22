@@ -1,0 +1,8 @@
+.venv/
+.env
+Microsoft/
+pip/
+pgadmin/
+__pycache__/
+*.pyc
+*.pyo

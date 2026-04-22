@@ -1,67 +1,30 @@
-# Proyectos de Grado API
+# Proyectos de Grado Monorepo
 
-Backend del sistema de seguimiento de trabajos de grado con Django + PostgreSQL + Docker.
+Monorepo del sistema de seguimiento de trabajos de grado de la Universidad de Narino.
 
-## Requisitos
+## Estructura
 
-- Docker Desktop
-- Docker Compose
+- `ProyectosdeGrado_API/`: backend Django, Dockerfile y recursos de base de datos.
+- `ProyectosdeGrado_WEB/`: frontend Angular.
+- Raiz: orquestacion compartida con `docker-compose.yml`, `.env`, `.gitignore` y `.dockerignore`.
 
-## 1) Configurar variables de entorno
-
-Verifica que exista el archivo `.env` en la raíz del proyecto con los datos de base de datos.
-
-## 2) Levantar contenedores
+## Levantar todo el entorno
 
 ```bash
-docker compose up -d --build
+docker-compose up --build
 ```
 
-## 3) Ejecutar migraciones
+## Comandos utiles
 
 ```bash
-docker compose exec api python manage.py migrate
+docker-compose exec api python manage.py crear_comite
+docker-compose exec api python manage.py migrate token_blacklist
+docker-compose exec api python manage.py migrate
+docker-compose logs -f api
+docker-compose down
 ```
 
-## 4) Comandos importantes (ejecutar una vez por base de datos)
+## Variables de entorno
 
-Crear usuario inicial del comité curricular:
-
-```bash
-docker compose exec api python manage.py crear_comite
-```
-
-Crear tablas de blacklist para JWT (logout/refresh):
-
-```bash
-docker compose exec api python manage.py migrate token_blacklist
-```
-
-## 5) Ver logs (opcional)
-
-```bash
-docker compose logs -f api
-docker compose logs -f db
-```
-
-## 6) Detener contenedores
-
-```bash
-docker compose down
-```
-
-## 7) Eliminar contenedores, redes y volúmenes
-
-```bash
-docker compose down -v
-```
-
-## 8) Vaciar base de datos (opcional)
-
-```bash
-docker compose exec db psql -U proyectos_user -d proyectos_grado -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
-```
-
-## Nota
-
-Si borras volúmenes (`docker compose down -v`) o cambias a una base de datos nueva/vacía, debes volver a ejecutar migraciones y el comando `crear_comite`.
+- `.env` en la raiz: variables compartidas entre servicios.
+- `ProyectosdeGrado_API/.env`: variables exclusivas del backend Django.

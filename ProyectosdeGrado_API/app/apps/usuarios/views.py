@@ -38,27 +38,32 @@ class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if not serializer.is_valid():
-            return error("Credenciales invalidas.")
-        return ok("Inicio de sesion exitoso.", serializer.validated_data)
+            detalle = serializer.errors.get("non_field_errors", ["Credenciales incorrectas"])[0]
+            return error(detalle, status.HTTP_400_BAD_REQUEST)
+        return ok("Login exitoso", serializer.validated_data)
 
 
 class RefreshTokenView(TokenRefreshView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
+        data = request.data.copy()
+        if "refresh" not in data and "refresh_token" in data:
+            data["refresh"] = data["refresh_token"]
+        request._full_data = data
         response = super().post(request, *args, **kwargs)
         if response.status_code != 200:
             return error("Token invalido.", response.status_code)
-        return ok("Token actualizado.", {"access_token": response.data["access"]})
+        return ok("Token actualizado.", {"access": response.data["access"]})
 
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        token = request.data.get("refresh_token")
+        token = request.data.get("refresh") or request.data.get("refresh_token")
         if not token:
-            return error("Debe enviar refresh_token.")
+            return error("Debe enviar refresh.")
         try:
             RefreshToken(token).blacklist()
             return ok("Sesion cerrada correctamente.")

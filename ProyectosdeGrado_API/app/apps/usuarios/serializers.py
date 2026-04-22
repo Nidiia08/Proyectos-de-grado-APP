@@ -43,10 +43,11 @@ class LoginSerializer(serializers.Serializer):
 
     correo = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+    rol = serializers.ChoiceField(choices=UsuarioRol.Rol.choices)
 
     def validate(self, attrs):
         try:
-            return autenticar_usuario(attrs["correo"], attrs["password"])
+            return autenticar_usuario(attrs["correo"], attrs["password"], attrs["rol"])
         except ValueError as exc:
             raise serializers.ValidationError(str(exc))
 

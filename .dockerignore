@@ -1,17 +1,23 @@
+# Entornos virtuales
 .venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
+ProyectosdeGrado_API/.venv/
+
+# Variables de entorno
 .env
-db.sqlite3
-docker-compose.yml
-docker-compose.*.yml
-Dockerfile
+ProyectosdeGrado_API/.env
+
+# Cache Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Angular
+ProyectosdeGrado_WEB/node_modules/
+ProyectosdeGrado_WEB/.angular/
+
+# Git
 .git/
 .gitignore
-.vscode/
-pgadmin/
-backup_mysql.json
-MIGRACION_POSTGRES.md
-proyectos_grado_postgres.sql
+
+# README
+README.md
