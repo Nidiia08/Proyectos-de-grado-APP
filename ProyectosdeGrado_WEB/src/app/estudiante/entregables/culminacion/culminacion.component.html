@@ -1,0 +1,98 @@
+@if (access === 'locked') {
+  <mat-card appearance="outlined"><mat-card-content><p class="muted">Esta fase aun no esta disponible.</p></mat-card-content></mat-card>
+} @else {
+  @if (model(); as m) {
+    <div class="culminacion">
+      @if (access === 'readonly') {
+        <mat-card class="readonly-banner" appearance="outlined">
+          <mat-card-content>Esta fase ya fue completada y se muestra en modo de solo lectura.</mat-card-content>
+        </mat-card>
+      }
+
+      <mat-card class="banner" appearance="outlined">
+        <mat-card-content class="banner-inner">
+          <mat-icon>schedule</mat-icon>
+          <div>
+            <strong>Fecha limite (Comite Curricular)</strong>
+            <p>{{ formatDate(m.committeeDeadlineIso) }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      @if (submittedLocal || m.pendingEvaluation) {
+        <mat-card class="sent" appearance="outlined">
+          <mat-card-content>Estado: <strong>Enviado - pendiente de evaluacion</strong></mat-card-content>
+        </mat-card>
+      }
+
+      <p class="hint">
+        Puede adjuntar archivos directamente o complementar con un enlace a almacenamiento en la nube (Google Drive,
+        OneDrive, etc.).
+      </p>
+
+      @for (slot of slots; track slot.definition.id) {
+        <mat-card appearance="outlined" class="doc-card">
+          <mat-card-content>
+            <div class="doc-head">
+              <div>
+                <span class="doc-label">{{ slot.definition.label }}</span>
+                <mat-chip-set>
+                  <mat-chip [highlighted]="slot.definition.required">{{ slot.definition.required ? 'Requerido' : 'Opcional' }}</mat-chip>
+                </mat-chip-set>
+              </div>
+              <span class="status" [class.ok]="slot.status === 'uploaded'">{{ statusLabel(slot) }}</span>
+            </div>
+            <mat-divider />
+            <div class="doc-actions">
+              @if (slot.fileName) {
+                <p class="fname">{{ slot.fileName }}</p>
+              }
+              <input
+                type="file"
+                hidden
+                [id]="'culm-' + slot.definition.id"
+                accept=".pdf,.docx,.jpg,.jpeg,.png"
+                (change)="onFileSelected(slot, $event)"
+                [disabled]="!canEdit"
+              />
+              @if (canEdit) {
+                @if (slot.status === 'uploaded') {
+                  <button mat-stroked-button type="button" (click)="replace(slot)">Quitar archivo</button>
+                }
+                <button mat-flat-button color="primary" type="button" (click)="openPicker(slot.definition.id)">
+                  {{ slot.status === 'uploaded' ? 'Cambiar archivo' : 'Seleccionar archivo' }}
+                </button>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <mat-form-field class="full" appearance="outline">
+        <mat-label>Enlace a carpeta o archivos en la nube (opcional / complemento)</mat-label>
+        <input matInput [(ngModel)]="cloudLink" [readonly]="!canEdit" placeholder="https://..." />
+      </mat-form-field>
+
+      <div class="comment-box">
+        <label class="comment-box__label" for="culminacion-comment">Comentario adicional</label>
+        <p class="comment-box__hint">Opcional. Puedes dejar indicaciones sobre anexos, enlaces o aclaraciones finales.</p>
+        <textarea
+          id="culminacion-comment"
+          class="comment-box__textarea"
+          rows="4"
+          [(ngModel)]="comment"
+          [readonly]="!canEdit"
+          placeholder="Escribe aqui tu comentario..."
+        ></textarea>
+      </div>
+
+      <div class="submit-row">
+        <button mat-flat-button color="primary" type="button" (click)="enviar()" [disabled]="!canEdit || !allRequiredUploaded">
+          Enviar documentos finales
+        </button>
+      </div>
+    </div>
+  } @else {
+    <p class="muted">Cargando culminacion...</p>
+  }
+}

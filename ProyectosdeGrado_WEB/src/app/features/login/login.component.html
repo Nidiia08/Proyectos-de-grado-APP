@@ -1,0 +1,115 @@
+<div class="login-shell">
+  <section class="login-panel">
+    <div class="login-layout">
+      <div class="login-showcase">
+        <div class="login-showcase__media">
+          <img [src]="currentImage().src" [alt]="currentImage().alt" />
+          <div class="login-showcase__overlay"></div>
+        </div>
+        <div class="login-showcase__content">
+          <div class="login-showcase__badge">
+            <span>Acceso institucional</span>
+          </div>
+
+          <div class="login-showcase__headline">
+            <div class="login-showcase__mark">TG</div>
+            <div>
+              <h1>Sistema de Trabajos de Grado</h1>
+              <p>Gestion academica para estudiantes, asesores, jurados y comite en una sola plataforma.</p>
+            </div>
+          </div>
+
+          <div class="login-showcase__footer">
+            <div class="login-gallery__dots" aria-label="Indicadores del carrusel">
+              @for (image of loginImages; track image.src; let i = $index) {
+                <span
+                  class="login-gallery__dot"
+                  [class.login-gallery__dot--active]="i === currentImageIndex"
+                  [attr.aria-label]="'Imagen ' + (i + 1)"
+                ></span>
+              }
+            </div>
+
+            <div class="login-copy__card">
+              <span class="login-copy__title">Acceso seguro</span>
+              <p>Ingresa con tus credenciales institucionales para acceder a la plataforma academica.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form class="login-form" (ngSubmit)="submit()">
+        <div class="login-form__brand">
+          <div class="login-form__logo">TG</div>
+          <div>
+            <h2>Ingreso</h2>
+            <p>Ingresa con tu correo institucional</p>
+          </div>
+        </div>
+
+        <div class="login-form__section">
+          <span class="login-form__section-label">Ocupacion</span>
+
+          <div class="role-selector" aria-label="Seleccion de rol">
+            @for (role of roles; track role.value) {
+              <button
+              type="button"
+              class="role-selector__option"
+              [class.role-selector__option--active]="selectedRole === role.value"
+              [disabled]="cargando"
+              (click)="selectedRole = role.value"
+            >
+              {{ role.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="login-form__section">
+          <span class="login-form__section-label">Credenciales</span>
+
+          <div class="field-group">
+            <label for="email">Correo institucional</label>
+            <input
+              id="email"
+              type="email"
+              [(ngModel)]="correo"
+              name="correo"
+              placeholder="ejemplo@universidad.edu.co"
+              [disabled]="cargando"
+              required
+            />
+          </div>
+
+          <div class="field-group">
+            <label for="password">Contrasena</label>
+            <input
+              id="password"
+              type="password"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Ingresa tu contrasena"
+              [disabled]="cargando"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="login-form__summary">
+          <p class="login-role-hint">Ingresaras como {{ selectedRoleLabel() }}.</p>
+          <button type="submit" class="login-submit" [disabled]="cargando">
+            {{ cargando ? 'Ingresando...' : 'Iniciar sesion' }}
+          </button>
+        </div>
+
+        @if (error) {
+          <p class="login-form__error">{{ error }}</p>
+        }
+
+        <span class="login-link">Recuperar acceso con el Comite Curricular</span>
+
+        <p class="login-form__footnote">Universidad de Narino - Plataforma academica institucional</p>
+      </form>
+    </div>
+  </section>
+</div>

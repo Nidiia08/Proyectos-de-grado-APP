@@ -1,0 +1,131 @@
+<section class="projects-page">
+  <header class="page-header hero-card">
+    <div>
+      <p class="eyebrow">Gestión completa</p>
+      <h1>Proyectos</h1>
+      <p>Seguimiento, validación y asignación de jurados por proyecto.</p>
+    </div>
+    <button mat-flat-button color="primary" type="button" (click)="openCreateProject()">Registrar nuevo proyecto</button>
+  </header>
+
+  <mat-card class="filters-card">
+    <mat-card-content class="filters-grid">
+      <div class="filter-field">
+        <span class="filter-field__label">Buscar</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Buscar</mat-label>
+          <input matInput [value]="search()" (input)="search.set($any($event.target).value)" placeholder="Proyecto, estudiante o asesor" />
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Modalidad</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Modalidad</mat-label>
+          <mat-select [value]="modalityFilter()" (valueChange)="modalityFilter.set($event)">
+            <mat-option value="todas">Todas</mat-option>
+            <mat-option value="Investigación">Investigación</mat-option>
+            <mat-option value="Interacción Social">Interacción Social</mat-option>
+            <mat-option value="Pasantía">Pasantía</mat-option>
+            <mat-option value="Proyecto de Desarrollo de Software">Proyecto de Desarrollo de Software</mat-option>
+            <mat-option value="Proyecto de Intervención">Proyecto de Intervención</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Fase</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Fase</mat-label>
+          <mat-select [value]="phaseFilter()" (valueChange)="phaseFilter.set($event)">
+            <mat-option value="todas">Todas</mat-option>
+            <mat-option value="inscripcion">Inscripción</mat-option>
+            <mat-option value="aprobacion">Aprobación</mat-option>
+            <mat-option value="desarrollo">Desarrollo</mat-option>
+            <mat-option value="culminacion">Culminación</mat-option>
+            <mat-option value="evaluacion">Evaluación</mat-option>
+            <mat-option value="finalizado">Finalizado</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Estado</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select [value]="statusFilter()" (valueChange)="statusFilter.set($event)">
+            <mat-option value="todos">Todos</mat-option>
+            <mat-option value="pendiente_revision">Pendiente revisión</mat-option>
+            <mat-option value="en_curso">En curso</mat-option>
+            <mat-option value="pendiente_jurados">Pendiente jurados</mat-option>
+            <mat-option value="pendiente_programacion">Pendiente programación</mat-option>
+            <mat-option value="pendiente_acta_final">Pendiente acta final</mat-option>
+            <mat-option value="con_prorroga">Con prórroga</mat-option>
+            <mat-option value="finalizado">Finalizado</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Periodo</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Periodo</mat-label>
+          <mat-select [value]="periodFilter()" (valueChange)="periodFilter.set($event)">
+            <mat-option value="todos">Todos</mat-option>
+            @for (period of comite.periodos(); track period.id) {
+              <mat-option [value]="period.nombre">{{ period.nombre }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Asesor</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Asesor</mat-label>
+          <input matInput [value]="advisorFilter()" (input)="advisorFilter.set($any($event.target).value)" placeholder="Nombre del asesor" />
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="layout">
+    <div class="project-list">
+      @for (project of filteredProjects(); track project.id) {
+        <mat-card class="project-card" [class.selected]="selectedProject().id === project.id">
+          <mat-card-content>
+            <div class="topline">
+              <div>
+                <h3>{{ project.nombre }}</h3>
+                <p>{{ project.estudiantes.join(', ') }}</p>
+              </div>
+              <span>{{ statusLabel(project.estado) }}</span>
+            </div>
+
+            <div class="meta">
+              <span>{{ project.asesor }}</span>
+              <span>{{ project.modalidad }} · {{ project.subtipo }}</span>
+              <span>{{ comite.getPhaseLabel(project.faseActual) }}</span>
+              <span>{{ project.periodo }}</span>
+              <span>Inicio: {{ comite.formatDate(project.fechaInicio) }}</span>
+              <span>Límite: {{ comite.formatDate(project.fechaLimite) }}</span>
+            </div>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-stroked-button color="primary" type="button" (click)="selectProject(project)">Ver detalle</button>
+          </mat-card-actions>
+        </mat-card>
+      } @empty {
+        <mat-card class="empty-card">
+          <mat-card-content>No hay proyectos con los filtros aplicados.</mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <div class="detail-column">
+      @if (selectedProject(); as project) {
+        <app-comite-proyecto-detalle [project]="project" />
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,45 @@
+<section class="templates-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Repositorio institucional</p>
+      <h1>Plantillas del asesor</h1>
+      <p>Formatos oficiales listos para descarga y futura conexión con la API de archivos.</p>
+    </div>
+
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar plantilla</mat-label>
+      <input matInput [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Nombre del documento" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </header>
+
+  <div class="templates-grid">
+    @for (template of templates(); track template.id) {
+      <mat-card class="template-card">
+        <mat-card-content>
+          <div class="card-top">
+            <mat-chip class="category-chip">{{ template.categoria }}</mat-chip>
+            <span class="modality">{{ template.modalidadAplica }}</span>
+          </div>
+
+          <h3>{{ template.nombre }}</h3>
+          <p>{{ template.descripcion }}</p>
+        </mat-card-content>
+
+        <mat-card-actions align="end">
+          <button mat-flat-button color="primary" type="button" (click)="onDownload()">
+            <mat-icon>download</mat-icon>
+            Descargar
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    } @empty {
+      <mat-card class="empty-card">
+        <mat-card-content>
+          <h3>No hay coincidencias</h3>
+          <p>Pruebe con otro nombre o limpie la búsqueda para ver todas las plantillas.</p>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+</section>

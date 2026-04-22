@@ -1,0 +1,304 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Configuración general</p>
+      <h1>Administración</h1>
+      <p>Usuarios, permisos, periodos y parámetros globales del sistema.</p>
+    </div>
+  </header>
+
+  <mat-tab-group>
+    <mat-tab label="Usuarios">
+      <div class="panel">
+        <mat-card>
+          <mat-card-content class="grid">
+            <div class="field-block">
+              <span class="field-block__label">Buscar</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar</mat-label>
+                <input matInput [value]="searchUser()" (input)="searchUser.set($any($event.target).value)" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Rol</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Rol</mat-label>
+                <mat-select [value]="roleFilter()" (valueChange)="roleFilter.set($event)">
+                  <mat-option value="todos">Todos</mat-option>
+                  <mat-option value="Estudiante">Estudiante</mat-option>
+                  <mat-option value="Comité Curricular">Comité Curricular</mat-option>
+                  <mat-option value="Asesor/Director">Asesor/Director</mat-option>
+                  <mat-option value="Jurado Evaluador">Jurado Evaluador</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Estado</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Estado</mat-label>
+                <mat-select [value]="statusFilter()" (valueChange)="statusFilter.set($event)">
+                  <mat-option value="todos">Todos</mat-option>
+                  <mat-option value="Activo">Activo</mat-option>
+                  <mat-option value="Inactivo">Inactivo</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <div class="list">
+          @for (user of users(); track user.id) {
+            <mat-card>
+              <mat-card-content class="user-row">
+                <div>
+                  <strong>{{ user.nombre }}</strong>
+                  <p>{{ user.correo }} · {{ user.rol }} · {{ user.fechaRegistro }}</p>
+                </div>
+                <button mat-stroked-button color="primary" type="button" (click)="toggleUser(user.id)">
+                  {{ user.estado === 'Activo' ? 'Desactivar' : 'Activar' }}
+                </button>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+
+        <mat-card>
+          <mat-card-content class="grid">
+            <div class="field-block">
+              <span class="field-block__label">Nombre</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <input matInput [(ngModel)]="newUser.nombre" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Correo</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Correo</mat-label>
+                <input matInput [(ngModel)]="newUser.correo" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Rol</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Rol</mat-label>
+                <mat-select [(ngModel)]="newUser.rol">
+                  <mat-option value="Estudiante">Estudiante</mat-option>
+                  <mat-option value="Comité Curricular">Comité Curricular</mat-option>
+                  <mat-option value="Asesor/Director">Asesor/Director</mat-option>
+                  <mat-option value="Jurado Evaluador">Jurado Evaluador</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Contraseña temporal</span>
+              <div style="display: flex; gap: 8px;">
+                <mat-form-field appearance="outline" style="flex: 1;">
+                  <mat-label>Contraseña</mat-label>
+                  <input matInput [(ngModel)]="newUser.contrasena" readonly />
+                </mat-form-field>
+                <button mat-stroked-button color="accent" type="button" (click)="generateRandomPassword()" style="align-self: flex-end;">
+                  Generar
+                </button>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button mat-flat-button color="primary" type="button" (click)="createUser()" [disabled]="!newUser.contrasena">Crear nuevo usuario</button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Roles y permisos">
+      <div class="panel">
+        @for (role of comite.rolesPermisos(); track role.rol) {
+          <mat-card>
+            <mat-card-content>
+              <strong>{{ role.rol }}</strong>
+              <p>{{ role.permisos.join(', ') }}</p>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Periodos académicos">
+      <div class="panel">
+        <div class="list">
+          @for (period of comite.periodos(); track period.id) {
+            <mat-card>
+              <mat-card-content class="user-row">
+                <div>
+                  <strong>{{ period.nombre }}</strong>
+                  <p>{{ period.inicio }} a {{ period.fin }} · {{ period.estado }}</p>
+                </div>
+                <button mat-stroked-button color="warn" type="button" [disabled]="period.estado === 'Cerrado'" (click)="closePeriod(period.id)">
+                  Cerrar periodo
+                </button>
+              </mat-card-content>
+            </mat-card>
+          }
+        </div>
+
+        <mat-card>
+          <mat-card-content class="grid">
+            <div class="field-block">
+              <span class="field-block__label">Nombre</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Nombre</mat-label>
+                <input matInput [(ngModel)]="newPeriod.nombre" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Inicio</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Inicio</mat-label>
+                <input matInput type="date" [(ngModel)]="newPeriod.inicio" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Fin</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Fin</mat-label>
+                <input matInput type="date" [(ngModel)]="newPeriod.fin" />
+              </mat-form-field>
+            </div>
+
+            <div class="actions">
+              <button mat-flat-button color="primary" type="button" (click)="createPeriod()">Crear periodo académico</button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Plazos por defecto">
+      <div class="panel">
+        <mat-card>
+          <mat-card-content class="grid">
+            <div class="field-block">
+              <span class="field-block__label">Revisión jurados inscripción</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Revisión jurados inscripción</mat-label>
+                <input matInput type="number" [(ngModel)]="deadlines.revisionJuradosInscripcion" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Ajustes investigación 1</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Ajustes investigación 1</mat-label>
+                <input matInput type="number" [(ngModel)]="deadlines.ajustesInvestigacion1" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Ajustes investigación 2 y 3</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Ajustes investigación 2 y 3</mat-label>
+                <input matInput type="number" [(ngModel)]="deadlines.ajustesInvestigacion23" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Ajustes interacción 1</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Ajustes interacción 1</mat-label>
+                <input matInput type="number" [(ngModel)]="deadlines.ajustesInteraccion1" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Ajustes interacción 2</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Ajustes interacción 2</mat-label>
+                <input matInput type="number" [(ngModel)]="deadlines.ajustesInteraccion2" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Revisión informe final</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Revisión informe final</mat-label>
+                <input matInput type="number" [(ngModel)]="deadlines.revisionInformeFinal" />
+              </mat-form-field>
+            </div>
+
+            <div class="actions full">
+              <button mat-flat-button color="primary" type="button" (click)="saveDeadlines()">Guardar cambios</button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Parámetros generales">
+      <div class="panel">
+        <mat-card>
+          <mat-card-content class="grid">
+            <div class="field-block">
+              <span class="field-block__label">Nombre del departamento</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Nombre del departamento</mat-label>
+                <input matInput [(ngModel)]="params.nombreDepartamento" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Correo institucional</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Correo institucional</mat-label>
+                <input matInput [(ngModel)]="params.correo" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Director del departamento</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Director del departamento</mat-label>
+                <input matInput [(ngModel)]="params.directorDepartamento" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Máximo proyectos por asesor</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Máximo proyectos por asesor</mat-label>
+                <input matInput type="number" [(ngModel)]="params.maxProyectosAsesor" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Máximo proyectos por jurado</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Máximo proyectos por jurado</mat-label>
+                <input matInput type="number" [(ngModel)]="params.maxProyectosJurado" />
+              </mat-form-field>
+            </div>
+
+            <div class="field-block">
+              <span class="field-block__label">Mínimo asistentes socialización</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Mínimo asistentes socialización</mat-label>
+                <input matInput type="number" [(ngModel)]="params.minimoAsistentes" />
+              </mat-form-field>
+            </div>
+
+            <div class="actions full">
+              <button mat-flat-button color="primary" type="button" (click)="saveParams()">Guardar cambios</button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</section>

@@ -1,0 +1,98 @@
+@if (access === 'locked') {
+  <mat-card appearance="outlined"><mat-card-content><p class="muted">Esta fase aun no esta disponible.</p></mat-card-content></mat-card>
+} @else {
+  @if (model(); as m) {
+    <div class="desarrollo">
+      @if (access === 'readonly') {
+        <mat-card class="readonly-banner" appearance="outlined">
+          <mat-card-content>Esta fase ya fue completada y se muestra en modo de solo lectura.</mat-card-content>
+        </mat-card>
+      }
+
+      @if (m.prorrogaActiva && m.nuevaFechaFinIso) {
+        <mat-card class="prorroga" appearance="outlined">
+          <mat-card-content class="prorroga-inner">
+            <mat-chip-set><mat-chip highlighted>Prorroga activa</mat-chip></mat-chip-set>
+            <span>Nueva fecha de finalizacion: <strong>{{ formatIso(m.nuevaFechaFinIso) }}</strong></span>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <p class="prog-label">Progreso general: Informe {{ approvedCount }} de {{ m.informesTotales }} completado(s)</p>
+      <mat-progress-bar mode="determinate" [value]="progressValue(m)" />
+
+      @for (inf of informes; track inf.numero) {
+        <mat-card appearance="outlined" [class.disabled-card]="!inf.unlocked">
+          <mat-card-content>
+            <div class="head">
+              <h3 class="title">Informe {{ inf.numero }}</h3>
+              <mat-chip-set>
+                <mat-chip>{{ estadoLabel(inf) }}</mat-chip>
+              </mat-chip-set>
+            </div>
+            <p class="due">Fecha maxima de entrega: {{ formatIso(inf.fechaMaxEntregaIso) }}</p>
+
+            @if (!inf.unlocked) {
+              <p class="lock-msg">Este informe se habilitara cuando el anterior sea aprobado o el Comite lo autorice.</p>
+            }
+
+            @if (inf.observacion) {
+              <mat-card class="obs" appearance="outlined">
+                <mat-card-content>
+                  <strong>Observacion</strong>
+                  <p>{{ inf.observacion }}</p>
+                </mat-card-content>
+              </mat-card>
+            }
+
+            @if (inf.estado === 'aprobado' && inf.fechaAprobacionIso) {
+              <p class="ok">Aprobado el {{ formatIso(inf.fechaAprobacionIso) }} (solo lectura).</p>
+            }
+
+            @if (inf.unlocked && inf.estado !== 'aprobado') {
+              <input
+                type="file"
+                hidden
+                [id]="'inf-' + inf.numero"
+                accept=".pdf,.docx"
+                (change)="onFile(inf, $event)"
+                [disabled]="!canInteract"
+              />
+              <div class="comment-box">
+                <label class="comment-box__label" [for]="'comentario-informe-' + inf.numero">Comentario u observacion</label>
+                <p class="comment-box__hint">Agrega contexto corto sobre el archivo o aclaraciones para la revision.</p>
+                <textarea
+                  class="comment-box__textarea"
+                  [id]="'comentario-informe-' + inf.numero"
+                  rows="3"
+                  [(ngModel)]="inf.comentarioEstudiante"
+                  [readonly]="!canInteract"
+                  placeholder="Escribe aqui tu comentario..."
+                ></textarea>
+              </div>
+              <div class="row">
+                <button mat-stroked-button type="button" (click)="openFile(inf.numero)" [disabled]="!canInteract">
+                  Cargar informe
+                </button>
+                @if (inf.fileName) {
+                  <span class="fn">{{ inf.fileName }}</span>
+                }
+                <button
+                  mat-flat-button
+                  color="primary"
+                  type="button"
+                  (click)="enviarInforme(inf)"
+                  [disabled]="!canInteract || !inf.fileName"
+                >
+                  Enviar informe
+                </button>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  } @else {
+    <p class="muted">Cargando fase de desarrollo...</p>
+  }
+}

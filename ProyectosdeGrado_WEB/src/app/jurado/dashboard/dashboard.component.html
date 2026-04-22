@@ -1,0 +1,130 @@
+<section class="jury-page">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Panel principal</p>
+      <h1>{{ perfil().nombre }}</h1>
+      <p class="subtitle">{{ perfil().rol }}</p>
+    </div>
+    <div class="date-pill">
+      <mat-icon>calendar_month</mat-icon>
+      <span>{{ todayLabel() }}</span>
+    </div>
+  </header>
+
+  <section class="metric-grid">
+    <mat-card class="metric-card accent-blue">
+      <mat-card-content>
+        <p>Total de proyectos asignados</p>
+        <strong>{{ metrics().total }}</strong>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="metric-card accent-yellow">
+      <mat-card-content>
+        <p>Pendientes de revisión</p>
+        <strong>{{ metrics().pendientesRevision }}</strong>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="metric-card accent-green">
+      <mat-card-content>
+        <p>Pendientes de evaluación</p>
+        <strong>{{ metrics().pendientesEvaluacion }}</strong>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="metric-card accent-indigo">
+      <mat-card-content>
+        <p>Avales de sustentación emitidos</p>
+        <strong>{{ metrics().avalesEmitidos }}</strong>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <div class="content-grid">
+    <mat-card class="panel-card">
+      <mat-card-header>
+        <mat-card-title>Alertas y pendientes</mat-card-title>
+        <mat-card-subtitle>Orden de urgencia</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @if (alertas().length) {
+          <div class="alert-list">
+            @for (alerta of alertas(); track alerta.id) {
+              <article class="alert-item">
+                <div class="alert-copy">
+                  <strong>{{ alerta.estudiante }}</strong>
+                  <h3>{{ alerta.proyecto }}</h3>
+                  <p>{{ alerta.accion }}</p>
+                  @if (alerta.diasRestantes !== undefined) {
+                    <mat-chip class="deadline-chip">{{ alerta.diasRestantes }} días restantes</mat-chip>
+                  }
+                </div>
+                <button mat-flat-button color="primary" type="button" (click)="openAlert(alerta.projectId, alerta.destino)">
+                  Ir a revisión
+                </button>
+              </article>
+            }
+          </div>
+        } @else {
+          <p class="empty-copy">No hay alertas urgentes registradas para este jurado.</p>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="panel-card">
+      <mat-card-header>
+        <mat-card-title>Resumen de proyectos</mat-card-title>
+        <mat-card-subtitle>Participación como revisor o evaluador</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="table-wrap">
+        <table mat-table [dataSource]="rows()" class="summary-table">
+          <ng-container matColumnDef="estudiantes">
+            <th mat-header-cell *matHeaderCellDef>Estudiante(s)</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="primary-text">{{ row.estudiantes.join(', ') }}</div>
+              <div class="secondary-text">{{ row.nombre }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="modalidad">
+            <th mat-header-cell *matHeaderCellDef>Modalidad</th>
+            <td mat-cell *matCellDef="let row">
+              <div class="primary-text">{{ row.modalidad }}</div>
+              <div class="secondary-text">{{ row.subtipo }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="rol">
+            <th mat-header-cell *matHeaderCellDef>Rol del jurado</th>
+            <td mat-cell *matCellDef="let row">
+              <mat-chip [class]="roleClass(row.rolJurado)">{{ roleLabel(row.rolJurado) }}</mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="fase">
+            <th mat-header-cell *matHeaderCellDef>Fase actual</th>
+            <td mat-cell *matCellDef="let row">{{ phaseLabel(row.faseActual) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let row">
+              <mat-chip [class]="statusClass(row.estado)">{{ statusLabel(row.estado) }}</mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let row">
+              <button mat-stroked-button color="primary" type="button" (click)="openProject(row.id)">Ver detalle</button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

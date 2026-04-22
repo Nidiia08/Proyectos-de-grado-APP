@@ -1,0 +1,79 @@
+<div class="estudiante-dashboard">
+  @if (summary(); as s) {
+    <mat-card class="header-card" appearance="outlined">
+      <mat-card-content>
+        <div class="header-grid">
+          <div class="header-main">
+            <h1 class="mat-headline-small title">Panel del estudiante</h1>
+            <p class="student-name">{{ s.studentName }}</p>
+          </div>
+          <mat-divider class="divider-mobile" [vertical]="true" />
+          <div class="header-meta">
+            <div class="meta-block">
+              <span class="meta-label">Tipo de trabajo de grado</span>
+              <p class="meta-value">{{ projectTypeText(s) }}</p>
+            </div>
+            <div class="meta-block">
+              <span class="meta-label">Estado del proyecto</span>
+              <mat-chip-set class="status-chip-set" aria-label="Estado actual">
+                <mat-chip class="status-chip" highlighted>{{ s.statusLabel }}</mat-chip>
+              </mat-chip-set>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="phases-section panel-card" appearance="outlined" aria-labelledby="phases-heading">
+      <mat-card-content>
+        <h2 id="phases-heading" class="section-title">Resumen de fases</h2>
+        <p class="section-hint">
+          Progreso en el proceso: las fases anteriores a la actual se consideran completadas.
+        </p>
+
+        <div class="progress-summary" aria-label="Progreso general del proceso">
+          <div class="progress-summary__top">
+            <div>
+              <span class="progress-summary__label">Avance general</span>
+              <strong>{{ completedPhasesCount(s) }} de {{ phases.length }} fases</strong>
+            </div>
+            <span class="progress-summary__value">{{ progressPercent(s) }}%</span>
+          </div>
+
+          <div class="progress-summary__track">
+            <span class="progress-summary__fill" [style.width.%]="progressPercent(s)"></span>
+          </div>
+        </div>
+
+        <div class="stepper-wrap">
+          <mat-stepper
+            class="phase-stepper"
+            orientation="horizontal"
+            [linear]="false"
+            [selectedIndex]="activeStepIndex(s)"
+            [disableRipple]="true"
+            labelPosition="bottom"
+            animationDuration="0ms"
+          >
+            @for (p of phases; track p.id) {
+              <mat-step [completed]="stepCompleted(p.id, s)" [editable]="false">
+                <ng-template matStepLabel>
+                  <span
+                    class="step-label"
+                    [class.step-label--active]="stepActive(p.id, s)"
+                    [class.step-label--done]="stepCompleted(p.id, s)"
+                  >
+                    {{ p.label }}
+                  </span>
+                </ng-template>
+                <div class="step-body-placeholder"></div>
+              </mat-step>
+            }
+          </mat-stepper>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <div class="loading-placeholder" role="status" aria-live="polite">Cargando información...</div>
+  }
+</div>

@@ -1,0 +1,136 @@
+.muted {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.culminacion {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.readonly-banner {
+  background: var(--mat-sys-surface-container);
+}
+
+.banner {
+  background: var(--mat-sys-primary-container);
+  border-color: var(--mat-sys-primary) !important;
+}
+
+.banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.banner-inner mat-icon {
+  color: var(--mat-sys-primary);
+}
+
+.sent {
+  background: color-mix(in srgb, var(--mat-sys-tertiary) 12%, transparent);
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.doc-card mat-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.doc-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.doc-label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+}
+
+.status {
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.status.ok {
+  color: var(--mat-sys-tertiary);
+  font-weight: 600;
+}
+
+.doc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.fname {
+  margin: 0;
+  flex: 1;
+  min-width: 8rem;
+  font-size: 0.9rem;
+}
+
+.full {
+  width: 100%;
+}
+
+.comment-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 18px;
+  background: #f8fafc;
+}
+
+.comment-box__label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.comment-box__hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.comment-box__textarea {
+  width: 100%;
+  min-height: 6rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 14px;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
+  line-height: 1.45;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.comment-box__textarea:focus {
+  outline: 2px solid rgba(14, 165, 233, 0.18);
+  border-color: #0ea5e9;
+}
+
+.comment-box__textarea[readonly] {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.submit-row {
+  display: flex;
+  justify-content: flex-end;
+}

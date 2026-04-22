@@ -1,0 +1,140 @@
+:host {
+  --advisor-blue: #003087;
+  --advisor-green: #1d9e75;
+  display: block;
+}
+
+.notifications-page {
+  padding: 1.5rem;
+  min-height: 100%;
+  background: linear-gradient(180deg, #eef5fb 0%, #ffffff 45%);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--advisor-green);
+  font-size: 0.78rem;
+}
+
+.page-header h1 {
+  margin: 0.25rem 0 0;
+  color: var(--advisor-blue);
+}
+
+.page-header p {
+  margin: 0.35rem 0 0;
+  color: #4b5563;
+}
+
+.filters-card,
+.notification-card,
+.empty-card {
+  border-radius: 1rem;
+}
+
+.filters-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.project-search {
+  width: min(100%, 22rem);
+}
+
+.notification-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.notification-card.unread {
+  border-left: 4px solid var(--advisor-blue);
+}
+
+.notification-layout {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.notification-icon {
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 1rem;
+  background: #e6eefc;
+  color: var(--advisor-blue);
+}
+
+.notification-icon.is-unread {
+  background: #d9f3ea;
+  color: var(--advisor-green);
+}
+
+.notification-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.notification-copy h3 {
+  margin: 0;
+}
+
+.notification-copy p {
+  margin: 0.4rem 0 0.7rem;
+  color: #4b5563;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.unread-chip {
+  background: #fff0c2;
+  color: #8c6700;
+}
+
+.read-chip {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+@media (max-width: 900px) {
+  .page-header,
+  .filters-row,
+  .notification-layout,
+  .notification-top {
+    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .notifications-page {
+    padding: 1rem;
+  }
+
+  .project-search {
+    width: 100%;
+  }
+}

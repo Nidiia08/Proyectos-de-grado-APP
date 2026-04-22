@@ -1,0 +1,116 @@
+@if (access === 'locked') {
+  <mat-card appearance="outlined">
+    <mat-card-content><p class="locked-msg">Esta fase aun no esta disponible.</p></mat-card-content>
+  </mat-card>
+} @else {
+  @if (model(); as m) {
+    <div class="aprobacion">
+      @if (access === 'readonly') {
+        <mat-card class="readonly-banner" appearance="outlined">
+          <mat-card-content>Esta fase ya fue completada y se muestra en modo de solo lectura.</mat-card-content>
+        </mat-card>
+      }
+
+      @if (m.propuestaAprobada && m.acuerdoComiteFechaIso) {
+        <mat-card class="ok-banner" appearance="outlined">
+          <mat-card-content>
+            <strong>Propuesta aprobada</strong>
+            <p>Acuerdo del Comite Curricular: {{ formatIso(m.acuerdoComiteFechaIso) }}</p>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      @if (m.requiereActaCompromisoPasantia) {
+        <mat-card class="pasantia" appearance="outlined">
+          <mat-card-content>
+            <h3 class="h3">Pasantia - Acta de compromiso</h3>
+            <p>
+              Se requiere el Acta de Compromiso firmada por el Director del Departamento y la entidad receptora antes de
+              iniciar la fase de desarrollo.
+            </p>
+            <mat-chip-set>
+              <mat-chip [highlighted]="!m.actaCompromisoCumplida">
+                Estado: {{ m.actaCompromisoCumplida ? 'Recibida' : 'Pendiente' }}
+              </mat-chip>
+            </mat-chip-set>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <p class="intro">
+        Seguimiento de revisiones por jurados revisores. Plazos segun modalidad: investigacion hasta 3 iteraciones;
+        interaccion social hasta 2.
+      </p>
+
+      <mat-stepper orientation="vertical" [linear]="false" class="iter-stepper">
+        @for (it of iteraciones; track it.index) {
+          <mat-step [completed]="it.estado === 'aprobada'" [editable]="false">
+            <ng-template matStepLabel>Iteracion {{ it.index }}</ng-template>
+            <div class="step-body">
+              <p class="estado-line"><strong>Estado:</strong> {{ estadoLabel(it) }}</p>
+
+              @if (it.observacionesJurados) {
+                <mat-card appearance="outlined" class="obs">
+                  <mat-card-content>
+                    <strong>Observaciones de jurados</strong>
+                    <p>{{ it.observacionesJurados }}</p>
+                  </mat-card-content>
+                </mat-card>
+              }
+
+              @if (it.estado === 'con_observaciones' && it.diasHabilesRestantesEstudiante !== null) {
+                <p class="countdown">
+                  Dias habiles restantes para ajustes (estudiante): <strong>{{ it.diasHabilesRestantesEstudiante }}</strong>
+                </p>
+              }
+
+              @if (it.estado === 'con_observaciones') {
+                <div class="ajuste">
+                  <input
+                    type="file"
+                    hidden
+                    [id]="'ajuste-' + it.index"
+                    accept=".pdf,.docx"
+                    (change)="onFile(it, $event)"
+                    [disabled]="!canInteract"
+                  />
+                  @if (it.ajusteFileName) {
+                    <p>Archivo: {{ it.ajusteFileName }}</p>
+                  }
+                  <div class="comment-box">
+                    <label class="comment-box__label" [for]="'comentario-ajuste-' + it.index">Comentario del estudiante</label>
+                    <p class="comment-box__hint">Resume los ajustes realizados o deja una nota para jurados y asesor.</p>
+                    <textarea
+                      class="comment-box__textarea"
+                      [id]="'comentario-ajuste-' + it.index"
+                      rows="3"
+                      [(ngModel)]="it.comentarioEstudiante"
+                      [readonly]="!canInteract"
+                      placeholder="Describe brevemente los cambios realizados..."
+                    ></textarea>
+                  </div>
+                  <div class="row">
+                    <button mat-stroked-button type="button" (click)="openFile(it.index)" [disabled]="!canInteract">
+                      Subir propuesta con ajustes
+                    </button>
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      type="button"
+                      (click)="enviarAjustes(it)"
+                      [disabled]="!canInteract || !it.ajusteFileName"
+                    >
+                      Enviar ajustes
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-step>
+        }
+      </mat-stepper>
+    </div>
+  } @else {
+    <p class="loading">Cargando fase de aprobacion...</p>
+  }
+}

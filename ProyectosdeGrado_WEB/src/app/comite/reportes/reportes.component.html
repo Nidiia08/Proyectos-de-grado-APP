@@ -1,0 +1,29 @@
+<section class="page">
+  <header class="page-header"><div><p class="eyebrow">Estadísticas</p><h1>Reportes</h1><p>Panel de análisis del estado general de los trabajos de grado.</p></div></header>
+  <mat-tab-group>
+    <mat-tab label="Resumen general">
+      <div class="grid">
+        <mat-card class="chart-card"><mat-card-header><mat-card-title>Proyectos por fase</mat-card-title></mat-card-header><mat-card-content><canvas #chartCanvas></canvas></mat-card-content></mat-card>
+        <mat-card class="chart-card"><mat-card-header><mat-card-title>Proyectos por modalidad</mat-card-title></mat-card-header><mat-card-content><canvas #chartCanvas></canvas></mat-card-content></mat-card>
+      </div>
+    </mat-tab>
+    <mat-tab label="Tiempos y cumplimiento">
+      <div class="grid">
+        <mat-card class="chart-card"><mat-card-header><mat-card-title>Duración promedio por modalidad</mat-card-title></mat-card-header><mat-card-content><canvas #chartCanvas></canvas></mat-card-content></mat-card>
+        <mat-card class="chart-card"><mat-card-header><mat-card-title>Proyectos con prórroga vs sin prórroga</mat-card-title></mat-card-header><mat-card-content><canvas #chartCanvas></canvas></mat-card-content></mat-card>
+      </div>
+    </mat-tab>
+    <mat-tab label="Calificaciones">
+      <div class="grid">
+        <mat-card class="chart-card"><mat-card-header><mat-card-title>Distribución de notas finales</mat-card-title></mat-card-header><mat-card-content><canvas #chartCanvas></canvas></mat-card-content></mat-card>
+        <mat-card class="chart-card"><mat-card-header><mat-card-title>Aprobados / Reprobados / Meritorios / Laureados</mat-card-title></mat-card-header><mat-card-content><canvas #chartCanvas></canvas></mat-card-content></mat-card>
+      </div>
+    </mat-tab>
+    <mat-tab label="Exportar">
+      <div class="export-grid">
+        <mat-card><mat-card-content><h3>Exportar reporte completo en PDF</h3><button mat-flat-button color="primary" type="button" (click)="exportMock('pdf')">Exportar PDF</button></mat-card-content></mat-card>
+        <mat-card><mat-card-content><h3>Exportar listado de proyectos en Excel</h3><button mat-flat-button color="primary" type="button" (click)="exportMock('excel')">Exportar Excel</button></mat-card-content></mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</section>

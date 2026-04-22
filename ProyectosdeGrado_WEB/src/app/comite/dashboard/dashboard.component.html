@@ -1,0 +1,77 @@
+<section class="committee-page">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Panel de control general</p>
+      <h1>{{ perfil().nombre }}</h1>
+      <p>Periodo activo: {{ perfil().periodoActivo }}</p>
+    </div>
+    <div class="date-pill">
+      <mat-icon>calendar_month</mat-icon>
+      <span>{{ todayLabel() }}</span>
+    </div>
+  </header>
+
+  <section class="metric-grid">
+    <mat-card class="metric-card"><mat-card-content><p>Total activos</p><strong>{{ metrics().activos }}</strong></mat-card-content></mat-card>
+    <mat-card class="metric-card"><mat-card-content><p>Inscripción</p><strong>{{ metrics().inscripcion }}</strong></mat-card-content></mat-card>
+    <mat-card class="metric-card"><mat-card-content><p>Aprobación</p><strong>{{ metrics().aprobacion }}</strong></mat-card-content></mat-card>
+    <mat-card class="metric-card"><mat-card-content><p>Desarrollo</p><strong>{{ metrics().desarrollo }}</strong></mat-card-content></mat-card>
+    <mat-card class="metric-card"><mat-card-content><p>Culminación</p><strong>{{ metrics().culminacion }}</strong></mat-card-content></mat-card>
+    <mat-card class="metric-card"><mat-card-content><p>Evaluación</p><strong>{{ metrics().evaluacion }}</strong></mat-card-content></mat-card>
+    <mat-card class="metric-card"><mat-card-content><p>Finalizados</p><strong>{{ metrics().finalizados }}</strong></mat-card-content></mat-card>
+  </section>
+
+  <div class="main-grid">
+    <mat-card class="panel-card">
+      <mat-card-header><mat-card-title>Alertas y pendientes urgentes</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <div class="alert-list">
+          @for (alerta of alertas(); track alerta.id) {
+            <article class="alert-item">
+              <div>
+                <strong>{{ alerta.estudiante }}</strong>
+                <h3>{{ alerta.proyecto }}</h3>
+                <p>{{ alerta.fase }} · {{ alerta.accion }}</p>
+                @if (alerta.diasRestantes !== undefined) {
+                  <span class="days">{{ alerta.diasRestantes }} días</span>
+                }
+              </div>
+              <button mat-flat-button color="primary" type="button" (click)="openProject(alerta.projectId)">Ir al proyecto</button>
+            </article>
+          } @empty {
+            <p class="empty-copy">No hay alertas urgentes.</p>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="panel-card chart-card">
+      <mat-card-header><mat-card-title>Distribución por fase</mat-card-title></mat-card-header>
+      <mat-card-content><canvas #phaseCanvas></canvas></mat-card-content>
+    </mat-card>
+
+    <mat-card class="panel-card chart-card">
+      <mat-card-header><mat-card-title>Distribución por modalidad</mat-card-title></mat-card-header>
+      <mat-card-content><canvas #modalityCanvas></canvas></mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card class="panel-card recent-card">
+    <mat-card-header>
+      <mat-card-title>Proyectos recientes</mat-card-title>
+      <button mat-stroked-button color="primary" type="button" (click)="viewAll()">Ver todos</button>
+    </mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="recent()" class="summary-table">
+        <ng-container matColumnDef="estudiantes"><th mat-header-cell *matHeaderCellDef>Estudiante(s)</th><td mat-cell *matCellDef="let row">{{ row.estudiantes.join(', ') }}</td></ng-container>
+        <ng-container matColumnDef="modalidad"><th mat-header-cell *matHeaderCellDef>Modalidad</th><td mat-cell *matCellDef="let row">{{ row.modalidad }} · {{ row.subtipo }}</td></ng-container>
+        <ng-container matColumnDef="fase"><th mat-header-cell *matHeaderCellDef>Fase actual</th><td mat-cell *matCellDef="let row">{{ comite.getPhaseLabel(row.faseActual) }}</td></ng-container>
+        <ng-container matColumnDef="estado"><th mat-header-cell *matHeaderCellDef>Estado</th><td mat-cell *matCellDef="let row">{{ comite.getStatusLabel(row.estado) }}</td></ng-container>
+        <ng-container matColumnDef="actividad"><th mat-header-cell *matHeaderCellDef>Última actividad</th><td mat-cell *matCellDef="let row">{{ comite.formatDateTime(row.ultimaActividad) }}</td></ng-container>
+        <ng-container matColumnDef="acciones"><th mat-header-cell *matHeaderCellDef>Acciones</th><td mat-cell *matCellDef="let row"><button mat-stroked-button color="primary" type="button" (click)="openProject(row.id)">Ver detalle</button></td></ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</section>

@@ -1,0 +1,24 @@
+<section class="page">
+  <header class="page-header">
+    <div><p class="eyebrow">Repositorio central</p><h1>Plantillas</h1><p>El comité puede descargar, reemplazar y eliminar formatos oficiales.</p></div>
+    <button mat-flat-button color="primary" type="button" (click)="uploadTemplate()">Subir nueva plantilla</button>
+  </header>
+  <mat-form-field appearance="outline" class="search-field"><mat-label>Buscar plantilla</mat-label><input matInput [ngModel]="search()" (ngModelChange)="search.set($event)" /><mat-icon matSuffix>search</mat-icon></mat-form-field>
+  <div class="grid">
+    @for (template of templates(); track template.id) {
+      <mat-card class="card">
+        <mat-card-content>
+          <strong>{{ template.nombre }}</strong>
+          <p>{{ template.categoria }} · {{ template.fase }}</p>
+          <p>Aplica a: {{ template.modalidadAplica }}</p>
+          <p>Última actualización: {{ comite.formatDate(template.ultimaActualizacion) }}</p>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-stroked-button color="primary" type="button">Descargar</button>
+          <button mat-stroked-button color="primary" type="button" (click)="replaceTemplate(template.id)">Reemplazar archivo</button>
+          <button mat-stroked-button color="warn" type="button" (click)="deleteTemplate(template.id)">Eliminar</button>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+</section>

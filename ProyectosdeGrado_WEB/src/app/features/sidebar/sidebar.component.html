@@ -1,0 +1,44 @@
+<aside class="sidebar-shell">
+  <div class="sidebar-shell__inner">
+    <header class="sidebar-brand">
+      <div class="sidebar-brand__mark">TG</div>
+      <div class="sidebar-brand__copy">
+        <h2>Sistema de Trabajos de Grado</h2>
+        <p>{{ roleName() }}</p>
+      </div>
+    </header>
+
+    <nav class="sidebar-nav" aria-label="Navegacion principal">
+      <ul>
+        @for (item of menuItems(); track item.id) {
+          <li>
+            <button
+              type="button"
+              class="sidebar-link"
+              [class.sidebar-link--active]="currentView() === item.id"
+              (click)="selectView(item.id)"
+            >
+              <span
+                class="sidebar-link__icon"
+                [matBadge]="unreadBadgeValue(item.id)"
+                [matBadgeHidden]="!showUnreadBadge(item.id)"
+                matBadgeColor="warn"
+                matBadgeSize="small"
+              >
+                {{ item.icon }}
+              </span>
+              <span class="sidebar-link__label">{{ item.label }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <footer class="sidebar-footer">
+      <button type="button" class="sidebar-logout" (click)="logout()">
+        <span class="sidebar-logout__icon">|</span>
+        <span>Cerrar sesión</span>
+      </button>
+    </footer>
+  </div>
+</aside>

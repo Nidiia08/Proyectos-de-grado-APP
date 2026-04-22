@@ -1,0 +1,79 @@
+<section class="chat-page">
+  <header class="chat-header">
+    <div class="header-icon">
+      <mat-icon>forum</mat-icon>
+    </div>
+    <div class="header-meta">
+      <h1 class="page-title">{{ pageTitle() }}</h1>
+      <p class="page-subtitle">{{ pageSubtitle() }}</p>
+    </div>
+    <div class="header-status">
+      <span class="status-dot" [class.status-dot--active]="!advisorTyping"></span>
+      {{ availableStatus() }}
+    </div>
+  </header>
+
+  <section class="chat-panel">
+    <div class="chat-contact">
+      <div class="avatar avatar--director">{{ getInitials(contactName()) }}</div>
+      <div>
+        <p class="contact-name">{{ contactName() }}</p>
+        <p class="contact-role">{{ contactRole() }} - {{ projectName }}</p>
+      </div>
+    </div>
+
+    <div class="thread-container">
+      @for (message of messages; track message.id; let index = $index) {
+        @if (shouldShowDayDivider(index)) {
+          <div class="date-chip">{{ formatDayLabel(message.sentAt) }}</div>
+        }
+
+        <article class="message" [class.message--own]="message.own">
+          <div class="avatar" [class.avatar--student]="message.own" [class.avatar--director]="!message.own">
+            {{ getInitials(message.author) }}
+          </div>
+
+          <div class="bubble-wrap">
+            <div class="bubble-meta">
+              <span class="bubble-name">{{ message.author }}</span>
+              <span class="bubble-role">{{ message.role }}</span>
+              <span class="bubble-time">{{ formatTime(message.sentAt) }}</span>
+            </div>
+            <div class="bubble">{{ message.text }}</div>
+          </div>
+        </article>
+      }
+
+      @if (advisorTyping) {
+        <article class="message">
+          <div class="avatar avatar--director">{{ getInitials(contactName()) }}</div>
+          <div class="bubble-wrap">
+            <div class="bubble-meta">
+              <span class="bubble-name">{{ contactName() }}</span>
+              <span class="bubble-role">{{ contactRole() }}</span>
+            </div>
+            <div class="bubble bubble--typing">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+
+    <div class="composer">
+      <input
+        type="text"
+        class="composer-input"
+        [(ngModel)]="draftMessage"
+        placeholder="Escribe un mensaje para continuar la conversación"
+        (keydown)="handleComposerKeydown($event)"
+      />
+      <button type="button" class="composer-btn" [disabled]="!draftMessage.trim()" (click)="sendMessage()">
+        <mat-icon>send</mat-icon>
+        Enviar
+      </button>
+    </div>
+  </section>
+</section>

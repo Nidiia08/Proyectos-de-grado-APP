@@ -1,0 +1,150 @@
+<section class="detail-shell">
+  <header class="detail-header">
+    <div>
+      <h2>{{ project.nombre }}</h2>
+      <p>{{ project.estudiantes.join(', ') }} · {{ project.modalidad }} / {{ project.subtipo }}</p>
+    </div>
+    <mat-chip class="progress-chip">{{ project.progreso }}% de avance</mat-chip>
+  </header>
+
+  <mat-card class="detail-card">
+    <mat-card-content>
+      <mat-stepper orientation="vertical" [linear]="false">
+        <mat-step [completed]="project.faseActual !== 'inscripcion'">
+          <ng-template matStepLabel>Inscripción</ng-template>
+          <div class="phase-block">
+            <div class="phase-meta">
+              <p><strong>Estado general:</strong> {{ project.estadoInscripcion }}</p>
+              <p><strong>Comentario del estudiante:</strong> {{ project.comentarioInscripcion }}</p>
+            </div>
+
+            <mat-list>
+              @for (documento of project.documentosInscripcion; track documento.id) {
+                <mat-list-item>
+                  <span matListItemTitle>{{ documento.nombre }}</span>
+                  <span matListItemLine>{{ documento.estado }} · {{ asesor.formatDate(documento.fecha) }}</span>
+                </mat-list-item>
+              }
+            </mat-list>
+
+            <button mat-flat-button color="primary" type="button" (click)="refrendarPropuesta()">Refrendar propuesta</button>
+          </div>
+        </mat-step>
+
+        <mat-step [completed]="project.faseActual !== 'aprobacion' && project.faseActual !== 'inscripcion'">
+          <ng-template matStepLabel>Aprobación</ng-template>
+          <div class="phase-block">
+            @if (project.iteracionesAprobacion.length) {
+              <mat-accordion>
+                @for (iteration of project.iteracionesAprobacion; track iteration.id) {
+                  <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>Iteración {{ iteration.iteracion }}</mat-panel-title>
+                      <mat-panel-description>{{ iteration.estado }}</mat-panel-description>
+                    </mat-expansion-panel-header>
+
+                    <div class="iteration-block">
+                      <p><strong>Documento de ajustes:</strong> {{ iteration.documentoAjustes }}</p>
+                      <p><strong>Días hábiles restantes:</strong> {{ iteration.diasHabilesRestantes }}</p>
+                      <div class="stack">
+                        <strong>Observaciones de jurados</strong>
+                        @for (item of iteration.observacionesJurados; track item) {
+                          <p class="bullet-line">{{ item }}</p>
+                        }
+                      </div>
+                      <button mat-stroked-button color="primary" type="button" (click)="refrendarAjustes(iteration)">
+                        Refrendar ajustes
+                      </button>
+                    </div>
+                  </mat-expansion-panel>
+                }
+              </mat-accordion>
+            } @else {
+              <p class="empty-copy">No hay iteraciones de revisión registradas en esta fase.</p>
+            }
+          </div>
+        </mat-step>
+
+        <mat-step [completed]="project.faseActual === 'culminacion' || project.faseActual === 'evaluacion'">
+          <ng-template matStepLabel>Desarrollo</ng-template>
+          <div class="phase-block">
+            @if (project.informesTrimestrales.length) {
+              <div class="card-grid">
+                @for (report of project.informesTrimestrales; track report.id) {
+                  <mat-card class="mini-card">
+                    <mat-card-content>
+                      <h3>Informe {{ report.numero }}</h3>
+                      <p>{{ report.periodo }}</p>
+                      <p><strong>Archivo:</strong> {{ report.archivo }}</p>
+                      <p><strong>Comentario:</strong> {{ report.comentarioEstudiante }}</p>
+                      <p><strong>Estado:</strong> {{ report.estado }}</p>
+                    </mat-card-content>
+                    <mat-card-actions align="end">
+                      <button mat-stroked-button color="primary" type="button" (click)="agregarObservacion(report)">
+                        Agregar observación
+                      </button>
+                    </mat-card-actions>
+                  </mat-card>
+                }
+              </div>
+            } @else {
+              <p class="empty-copy">No hay informes trimestrales cargados.</p>
+            }
+          </div>
+        </mat-step>
+
+        <mat-step [completed]="project.faseActual === 'evaluacion'">
+          <ng-template matStepLabel>Culminación</ng-template>
+          <div class="phase-block">
+            <mat-list>
+              @for (documento of project.documentosCulminacion; track documento.id) {
+                <mat-list-item>
+                  <span matListItemTitle>{{ documento.nombre }}</span>
+                  <span matListItemLine>{{ documento.estado }} · {{ asesor.formatDate(documento.fecha) }}</span>
+                </mat-list-item>
+              } @empty {
+                <mat-list-item>No hay documentos finales registrados.</mat-list-item>
+              }
+            </mat-list>
+
+            @if (project.enlaceNube) {
+              <p class="cloud-link"><strong>Enlace en la nube:</strong> {{ project.enlaceNube }}</p>
+            }
+
+            <button mat-flat-button color="primary" type="button" (click)="emitirCarta()">Emitir carta de cumplimiento</button>
+          </div>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel>Evaluación</ng-template>
+          <div class="phase-block">
+            <p><strong>Estado del proceso:</strong> {{ project.estadoEvaluacion }}</p>
+            <p><strong>Calificación final:</strong> {{ project.calificacionFinal || 'Aún no disponible' }}</p>
+            <p class="empty-copy">Esta fase es de solo lectura para el asesor.</p>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="detail-card">
+    <mat-card-header>
+      <mat-card-title>Historial del proyecto</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (project.historial.length) {
+        <div class="history-list">
+          @for (entry of project.historial; track entry.id) {
+            <div class="history-entry">
+              <strong>{{ entry.accion }}</strong>
+              <p>{{ entry.detalle }}</p>
+              <span>{{ asesor.formatDateTime(entry.fechaHora) }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="empty-copy">Las acciones realizadas por el asesor aparecerán aquí.</p>
+      }
+    </mat-card-content>
+  </mat-card>
+</section>

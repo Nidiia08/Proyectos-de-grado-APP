@@ -1,0 +1,111 @@
+<div class="entregables-root">
+  <mat-card class="hero-card" appearance="outlined">
+    <mat-card-content>
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <span class="eyebrow">Ruta de entregables</span>
+          <h1 class="title">Gestiona tu proceso por etapas</h1>
+          <p class="subtitle">{{ modalityHint() }}</p>
+          <p class="hint">
+            Encuentra rapidamente que fase esta activa, que ya entregaste y que sigue despues. Solo las fases
+            habilitadas permiten continuar con acciones o cargas de informacion.
+          </p>
+        </div>
+
+        <div class="hero-progress">
+          <div class="progress-head">
+            <span class="progress-label">Avance general</span>
+            <strong>{{ progressPercent() }}%</strong>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <span class="progress-bar" [style.width.%]="progressPercent()"></span>
+          </div>
+          <div class="stats-grid" aria-label="Resumen del flujo">
+            <article class="stat-card">
+              <span class="stat-value">{{ completedCount() }}</span>
+              <span class="stat-label">Completadas</span>
+            </article>
+            <article class="stat-card stat-card--current">
+              <span class="stat-value">{{ label(currentPhase()) }}</span>
+              <span class="stat-label">Fase actual</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-value">{{ lockedCount() }}</span>
+              <span class="stat-label">Pendientes</span>
+            </article>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <section class="workspace">
+    <aside class="phase-rail" aria-label="Fases del proceso">
+      @for (ph of phases; track ph; let idx = $index) {
+        <button
+          type="button"
+          class="phase-card"
+          [class.phase-card--selected]="selectedPhase() === ph"
+          [class.phase-card--active]="isCurrent(ph)"
+          [class.phase-card--done]="isCompleted(ph)"
+          [class.phase-card--locked]="locked(ph)"
+          [disabled]="locked(ph)"
+          (click)="selectPhase(ph)"
+        >
+          <div class="phase-index">{{ idx + 1 }}</div>
+          <div class="phase-copy">
+            <div class="phase-topline">
+              <span class="phase-name">{{ label(ph) }}</span>
+              <span class="phase-state">{{ phaseStateLabel(ph) }}</span>
+            </div>
+            <p class="phase-description">{{ phaseDescription(ph) }}</p>
+            <p class="phase-helper">{{ helperText(ph) }}</p>
+          </div>
+        </button>
+      }
+    </aside>
+
+    <div class="phase-panel">
+      <mat-card class="selected-phase" appearance="outlined">
+        <mat-card-content>
+          <div class="selected-phase__header">
+            <div>
+              <span class="selected-phase__eyebrow">Fase seleccionada</span>
+              <h2>{{ label(selectedPhase()) }}</h2>
+            </div>
+            <span
+              class="selected-phase__badge"
+              [class.selected-phase__badge--active]="isCurrent(selectedPhase())"
+              [class.selected-phase__badge--done]="isCompleted(selectedPhase())"
+              [class.selected-phase__badge--locked]="locked(selectedPhase())"
+            >
+              {{ phaseStateLabel(selectedPhase()) }}
+            </span>
+          </div>
+          <p class="selected-phase__text">{{ phaseDescription(selectedPhase()) }}</p>
+          <p class="selected-phase__helper">{{ helperText(selectedPhase()) }}</p>
+        </mat-card-content>
+      </mat-card>
+
+      <section class="phase-content">
+        @switch (selectedPhase()) {
+          @case ('inscripcion') {
+            <app-inscripcion [access]="access(selectedPhase())" />
+          }
+          @case ('aprobacion') {
+            <app-aprobacion [access]="access(selectedPhase())" />
+          }
+          @case ('desarrollo') {
+            <app-desarrollo [access]="access(selectedPhase())" />
+          }
+          @case ('culminacion') {
+            <app-culminacion [access]="access(selectedPhase())" />
+          }
+          @case ('evaluacion') {
+            <app-evaluacion [access]="access(selectedPhase())" />
+          }
+        }
+      </section>
+    </div>
+  </section>
+</div>

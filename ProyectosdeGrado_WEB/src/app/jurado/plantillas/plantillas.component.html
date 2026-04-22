@@ -1,0 +1,44 @@
+<section class="templates-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Repositorio institucional</p>
+      <h1>Plantillas del jurado</h1>
+      <p>Formatos oficiales para actuación como jurado revisor o jurado evaluador.</p>
+    </div>
+
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar plantilla</mat-label>
+      <input matInput [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Nombre del documento" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </header>
+
+  <div class="template-grid">
+    @for (template of templates(); track template.id) {
+      <mat-card class="template-card">
+        <mat-card-content>
+          <div class="chip-row">
+            <mat-chip class="category-chip">{{ template.categoria }}</mat-chip>
+            <mat-chip class="phase-chip">{{ template.fase }}</mat-chip>
+          </div>
+
+          <h3>{{ template.nombre }}</h3>
+          <p class="role-copy">Uso: {{ template.rolUso }}</p>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-flat-button color="primary" type="button" (click)="download()">
+            <mat-icon>download</mat-icon>
+            Descargar
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    } @empty {
+      <mat-card class="empty-card">
+        <mat-card-content>
+          <h3>Sin coincidencias</h3>
+          <p>No se encontraron plantillas para la búsqueda actual.</p>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+</section>

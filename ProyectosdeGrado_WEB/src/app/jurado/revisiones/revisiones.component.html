@@ -1,0 +1,175 @@
+<section class="reviews-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Bandeja principal</p>
+      <h1>Revisiones</h1>
+      <p>Acciones pendientes del jurado organizadas por tipo de intervención.</p>
+    </div>
+  </header>
+
+  <mat-card class="tabs-card">
+    <mat-card-content>
+      <mat-tab-group>
+        <mat-tab [label]="'Propuestas por revisar (' + buckets().propuestas.length + ')'">
+          <div class="tab-panel">
+            @for (project of buckets().propuestas; track project.id) {
+              @for (iteration of project.iteraciones; track iteration.id) {
+                @if (iteration.estado === 'pendiente_revision') {
+                  <mat-card class="review-card">
+                    <mat-card-content>
+                      <h3>{{ project.estudiantes.join(', ') }}</h3>
+                      <p>{{ project.nombre }}</p>
+                      <p class="support"><strong>Modalidad:</strong> {{ project.modalidad }} / {{ project.subtipo }}</p>
+                      <p class="support"><strong>Iteración:</strong> {{ iteration.numero }} de {{ iteration.maximo }}</p>
+                      <p class="support" [class.urgent]="iteration.diasHabilesRestantes < 2">
+                        <strong>Días hábiles restantes:</strong> {{ iteration.diasHabilesRestantes }}
+                      </p>
+                      <p class="support"><strong>Documento:</strong> {{ iteration.archivo }}</p>
+                      <p class="support"><strong>Comentario del estudiante:</strong> {{ iteration.comentarioEstudiante }}</p>
+
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Observaciones del jurado</mat-label>
+                        <textarea matInput rows="4" [(ngModel)]="observations['it-' + project.id + '-' + iteration.id]"></textarea>
+                      </mat-form-field>
+
+                      <div class="action-row">
+                        <button mat-stroked-button color="primary" type="button" (click)="emitObservations(project, iteration)">
+                          Emitir observaciones
+                        </button>
+                        <button mat-flat-button color="primary" type="button" (click)="approveProposal(project, iteration)">
+                          Aprobar propuesta
+                        </button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                }
+              }
+            } @empty {
+              <div class="empty-state">No hay propuestas pendientes por revisar.</div>
+            }
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'Informes finales por evaluar (' + buckets().informes.length + ')'">
+          <div class="tab-panel">
+            @for (project of buckets().informes; track project.id) {
+              <mat-card class="review-card">
+                <mat-card-content>
+                  <h3>{{ project.estudiantes.join(', ') }}</h3>
+                  <p>{{ project.nombre }}</p>
+                  <p class="support"><strong>Modalidad:</strong> {{ project.modalidad }} / {{ project.subtipo }}</p>
+                  <p class="support"><strong>Informe final:</strong> {{ project.evaluacion.informePrincipal }}</p>
+                  <p class="support"><strong>Anexos:</strong> {{ project.evaluacion.anexos.join(', ') || 'Sin anexos' }}</p>
+                  <p class="support"><strong>Enlace en la nube:</strong> {{ project.evaluacion.enlaceNube || 'No aplica' }}</p>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Observaciones previas a sustentación</mat-label>
+                    <textarea matInput rows="4" [(ngModel)]="observations['inf-' + project.id]"></textarea>
+                  </mat-form-field>
+
+                  <button mat-flat-button color="primary" type="button" (click)="confirmFinalReview(project)">
+                    Confirmar revisión del informe
+                  </button>
+                </mat-card-content>
+              </mat-card>
+            } @empty {
+              <div class="empty-state">No hay informes finales pendientes de evaluación.</div>
+            }
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'Avales de sustentación pendientes (' + buckets().avales.length + ')'">
+          <div class="tab-panel">
+            @for (project of buckets().avales; track project.id) {
+              <mat-card class="review-card">
+                <mat-card-content>
+                  <h3>{{ project.estudiantes.join(', ') }}</h3>
+                  <p>{{ project.nombre }}</p>
+                  <p class="support"><strong>Resumen:</strong> {{ project.evaluacion.observacionesRevision || 'Informe revisado y listo para aval.' }}</p>
+                  <p class="support"><strong>Sustentación:</strong> {{ project.evaluacion.sustentacionProgramada ? jurado.formatDateTime(project.evaluacion.sustentacionProgramada) : 'Pendiente' }}</p>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Observación opcional para el aval</mat-label>
+                    <textarea matInput rows="4" [(ngModel)]="observations['aval-' + project.id]"></textarea>
+                  </mat-form-field>
+
+                  <button mat-flat-button color="primary" type="button" (click)="emitAval(project)">
+                    Emitir aval de sustentación y socialización
+                  </button>
+                </mat-card-content>
+              </mat-card>
+            } @empty {
+              <div class="empty-state">No hay avales pendientes en este momento.</div>
+            }
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'Calificaciones pendientes (' + buckets().calificaciones.length + ')'">
+          <div class="tab-panel">
+            @for (project of buckets().calificaciones; track project.id) {
+              <mat-card class="review-card">
+                <mat-card-content>
+                  <h3>{{ project.estudiantes.join(', ') }}</h3>
+                  <p>{{ project.nombre }}</p>
+                  <p class="support"><strong>Fecha de sustentación:</strong> {{ project.evaluacion.sustentacionProgramada ? jurado.formatDateTime(project.evaluacion.sustentacionProgramada) : 'Sin fecha' }}</p>
+
+                  @if (!project.evaluacion.calificacionEnviada) {
+                    <div class="score-grid">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Cumplimiento de objetivos</mat-label>
+                        <input matInput type="number" [(ngModel)]="scoreModel(project).objetivos" />
+                      </mat-form-field>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Originalidad</mat-label>
+                        <input matInput type="number" [(ngModel)]="scoreModel(project).originalidad" />
+                      </mat-form-field>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Conclusiones</mat-label>
+                        <input matInput type="number" [(ngModel)]="scoreModel(project).conclusiones" />
+                      </mat-form-field>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Organización</mat-label>
+                        <input matInput type="number" [(ngModel)]="scoreModel(project).organizacion" />
+                      </mat-form-field>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Sustentación privada</mat-label>
+                        <input matInput type="number" [(ngModel)]="scoreModel(project).sustentacionPrivada" />
+                      </mat-form-field>
+                      <mat-form-field appearance="outline">
+                        <mat-label>Socialización pública</mat-label>
+                        <input matInput type="number" [(ngModel)]="scoreModel(project).socializacionPublica" />
+                      </mat-form-field>
+                    </div>
+
+                    <div class="totals-box" [class.ok]="meetsMinimums(project) && total(project) >= 60" [class.warn]="!meetsMinimums(project) || total(project) < 60">
+                      <span>Documento escrito: {{ documentSubtotal(project) }}/60</span>
+                      <span>Sustentación: {{ oralSubtotal(project) }}/40</span>
+                      <strong>Total: {{ total(project) }}/100</strong>
+                    </div>
+
+                    @if (!meetsMinimums(project)) {
+                      <p class="warning-copy">Debe cumplir mínimos: documento 36 puntos y sustentación 24 puntos.</p>
+                    }
+
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Observaciones finales</mat-label>
+                      <textarea matInput rows="4" [(ngModel)]="scoreModel(project).observacionesFinales"></textarea>
+                    </mat-form-field>
+
+                    <button mat-flat-button color="primary" type="button" (click)="submitGrade(project)">
+                      Enviar calificación definitiva
+                    </button>
+                  } @else {
+                    <p class="support">La calificación definitiva ya fue enviada por este jurado.</p>
+                  }
+                </mat-card-content>
+              </mat-card>
+            } @empty {
+              <div class="empty-state">No hay calificaciones pendientes por registrar.</div>
+            }
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</section>

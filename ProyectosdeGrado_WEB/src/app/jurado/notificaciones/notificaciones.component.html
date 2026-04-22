@@ -1,0 +1,65 @@
+<section class="notifications-page">
+  <header class="page-header hero-card">
+    <div>
+      <p class="eyebrow">Centro de alertas</p>
+      <h1>Notificaciones del jurado</h1>
+      <p>{{ unreadCount() }} sin leer.</p>
+    </div>
+
+    <button mat-flat-button color="primary" type="button" (click)="markAllRead()">
+      <mat-icon>done_all</mat-icon>
+      Marcar todas como leídas
+    </button>
+  </header>
+
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <mat-button-toggle-group [value]="filter()" (change)="filter.set($event.value)">
+        <mat-button-toggle value="all">Todas</mat-button-toggle>
+        <mat-button-toggle value="unread">No leídas</mat-button-toggle>
+        <mat-button-toggle value="reviewer">Como revisor</mat-button-toggle>
+        <mat-button-toggle value="evaluator">Como evaluador</mat-button-toggle>
+      </mat-button-toggle-group>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="notification-list">
+    @for (notification of notifications(); track notification.id) {
+      <mat-card class="notification-card" [class.unread]="!notification.leida">
+        <mat-card-content>
+          <div class="notification-layout">
+            <div class="icon-box">
+              <mat-icon>{{ jurado.getNotificationIcon(notification.tipo) }}</mat-icon>
+            </div>
+
+            <div class="notification-copy">
+              <div class="top-row">
+                <h3>{{ notification.titulo }}</h3>
+                <mat-chip [class]="notification.leida ? 'read-chip' : 'unread-chip'">
+                  {{ notification.leida ? 'Leída' : 'No leída' }}
+                </mat-chip>
+              </div>
+              <p>{{ notification.descripcion }}</p>
+              <div class="meta">
+                <span><strong>Estudiante:</strong> {{ notification.estudiante }}</span>
+                <span><strong>Proyecto:</strong> {{ notification.proyecto }}</span>
+                <span><strong>Fecha:</strong> {{ jurado.formatDateTime(notification.fechaHora) }}</span>
+              </div>
+            </div>
+
+            <button mat-stroked-button color="primary" type="button" (click)="goToProject(notification.projectId, notification.id)">
+              Ir al proyecto
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    } @empty {
+      <mat-card class="empty-card">
+        <mat-card-content>
+          <h3>Sin notificaciones</h3>
+          <p>Las novedades del proceso aparecerán aquí.</p>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+</section>

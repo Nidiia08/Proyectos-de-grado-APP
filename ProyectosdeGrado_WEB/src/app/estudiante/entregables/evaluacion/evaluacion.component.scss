@@ -1,0 +1,60 @@
+.muted {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.evaluacion {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.readonly-banner {
+  background: var(--mat-sys-surface-container);
+}
+
+.h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--mat-sys-primary);
+}
+
+.rubric-table {
+  width: 100%;
+}
+
+.rubric-table .num {
+  text-align: right;
+  width: 6rem;
+}
+
+.minimos {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.timeline-stepper ::ng-deep .mat-vertical-content-container {
+  margin-left: 1rem;
+}
+
+.step-detail {
+  padding: 0.35rem 0 0.75rem;
+}
+
+.step-detail p {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+}
+
+.pub {
+  border-left: 4px solid var(--mat-sys-primary);
+}
+
+.result {
+  background: var(--mat-sys-surface-container);
+}
+
+.res-list {
+  margin: 0;
+  padding-left: 1.25rem;
+}

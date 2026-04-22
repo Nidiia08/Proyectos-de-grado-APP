@@ -1,0 +1,177 @@
+<section class="reviews-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Espacio de trabajo</p>
+      <h1>Revisiones del asesor</h1>
+      <p>Centralice refrendos, conceptos y observaciones sobre los proyectos asignados.</p>
+    </div>
+  </header>
+
+  <mat-card class="tabs-card">
+    <mat-card-content>
+      <mat-tab-group>
+        <mat-tab [label]="'Pendientes de refrendo — Inscripción (' + buckets().inscripcion.length + ')'">
+          <div class="tab-panel">
+            @for (project of buckets().inscripcion; track project.id) {
+              <mat-card class="review-card">
+                <mat-card-content>
+                  <div class="review-header">
+                    <div>
+                      <h3>{{ project.estudiantes.join(', ') }}</h3>
+                      <p>{{ project.nombre }}</p>
+                    </div>
+                  </div>
+
+                  <div class="doc-list">
+                    @for (doc of project.documentosInscripcion; track doc.id) {
+                      <div class="doc-row">
+                        <span>{{ doc.nombre }}</span>
+                        <span>{{ doc.estado }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  <p class="support-text"><strong>Comentario del estudiante:</strong> {{ project.comentarioInscripcion }}</p>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Observación del asesor</mat-label>
+                    <textarea matInput rows="4" [(ngModel)]="observations['ins-' + project.id]"></textarea>
+                  </mat-form-field>
+
+                  <div class="actions-row">
+                    <button mat-flat-button color="primary" type="button" (click)="approveInscripcion(project)">
+                      Refrendar y aprobar
+                    </button>
+                    <button mat-stroked-button color="warn" type="button" (click)="requestInscripcionCorrections(project)">
+                      Solicitar correcciones
+                    </button>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            } @empty {
+              <div class="empty-state">No hay pendientes de refrendo en la fase de inscripción.</div>
+            }
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'Pendientes de refrendo — Ajustes de Aprobación (' + buckets().ajustesAprobacion.length + ')'">
+          <div class="tab-panel">
+            @for (project of buckets().ajustesAprobacion; track project.id) {
+              @for (iteration of project.iteracionesAprobacion; track iteration.id) {
+                @if (iteration.estado.toLowerCase().includes('pendiente')) {
+                  <mat-card class="review-card">
+                    <mat-card-content>
+                      <h3>{{ project.estudiantes.join(', ') }}</h3>
+                      <p>{{ project.nombre }} · Iteración {{ iteration.iteracion }}</p>
+                      <p class="support-text"><strong>Documento:</strong> {{ iteration.documentoAjustes }}</p>
+                      <p class="support-text"><strong>Días hábiles restantes:</strong> {{ iteration.diasHabilesRestantes }}</p>
+
+                      <div class="doc-list">
+                        @for (observation of iteration.observacionesJurados; track observation) {
+                          <div class="doc-row">
+                            <span>{{ observation }}</span>
+                          </div>
+                        }
+                      </div>
+
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Observación del asesor</mat-label>
+                        <textarea matInput rows="4" [(ngModel)]="observations['adj-' + project.id + '-' + iteration.id]"></textarea>
+                      </mat-form-field>
+
+                      <div class="actions-row">
+                        <button mat-flat-button color="primary" type="button" (click)="approveAdjustments(project, iteration)">
+                          Refrendar ajustes y enviar a jurados
+                        </button>
+                        <button mat-stroked-button color="warn" type="button" (click)="requestAdjustmentCorrections(project, iteration)">
+                          Solicitar correcciones al estudiante
+                        </button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                }
+              }
+            } @empty {
+              <div class="empty-state">No hay ajustes pendientes de refrendo.</div>
+            }
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'Informes trimestrales recibidos (' + buckets().informes.length + ')'">
+          <div class="tab-panel">
+            @for (project of buckets().informes; track project.id) {
+              @for (report of project.informesTrimestrales; track report.id) {
+                @if (report.estado === 'Pendiente de revisión') {
+                  <mat-card class="review-card">
+                    <mat-card-content>
+                      <h3>{{ project.estudiantes.join(', ') }}</h3>
+                      <p>{{ project.nombre }}</p>
+                      <p class="support-text"><strong>Informe:</strong> {{ report.numero }} · {{ report.periodo }}</p>
+                      <p class="support-text"><strong>Archivo:</strong> {{ report.archivo }}</p>
+                      <p class="support-text"><strong>Comentario del estudiante:</strong> {{ report.comentarioEstudiante }}</p>
+
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Observación del asesor</mat-label>
+                        <textarea matInput rows="4" [(ngModel)]="observations['rep-' + project.id + '-' + report.id]"></textarea>
+                      </mat-form-field>
+
+                      <div class="actions-row">
+                        <button mat-flat-button color="primary" type="button" (click)="markReportReviewed(project, report)">
+                          Marcar como revisado
+                        </button>
+                        <button mat-stroked-button color="warn" type="button" (click)="sendReportObservations(project, report)">
+                          Enviar observaciones al estudiante
+                        </button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                }
+              }
+            } @empty {
+              <div class="empty-state">No hay informes trimestrales pendientes.</div>
+            }
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'Culminación — Carta de cumplimiento pendiente (' + buckets().culminacion.length + ')'">
+          <div class="tab-panel">
+            @for (project of buckets().culminacion; track project.id) {
+              <mat-card class="review-card">
+                <mat-card-content>
+                  <h3>{{ project.estudiantes.join(', ') }}</h3>
+                  <p>{{ project.nombre }}</p>
+
+                  <div class="doc-list">
+                    @for (doc of project.documentosCulminacion; track doc.id) {
+                      <div class="doc-row">
+                        <span>{{ doc.nombre }}</span>
+                        <span>{{ doc.estado }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  @if (project.enlaceNube) {
+                    <p class="support-text"><strong>Enlace en la nube:</strong> {{ project.enlaceNube }}</p>
+                  }
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Observación del asesor</mat-label>
+                    <textarea matInput rows="4" [(ngModel)]="observations['cul-' + project.id]"></textarea>
+                  </mat-form-field>
+
+                  <div class="actions-row">
+                    <button mat-flat-button color="primary" type="button" (click)="emitCarta(project)">
+                      Emitir carta de cumplimiento
+                    </button>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            } @empty {
+              <div class="empty-state">No hay cartas de cumplimiento pendientes.</div>
+            }
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</section>

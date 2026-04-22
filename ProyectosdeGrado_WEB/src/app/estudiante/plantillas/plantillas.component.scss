@@ -1,0 +1,141 @@
+
+:host {
+  display: block;
+}
+
+.templates-page {
+  display: grid;
+  gap: 1rem;
+}
+
+.templates-hero {
+  margin-bottom: 0.1rem;
+}
+
+.templates-hero__title {
+  margin: 0.9rem 0 0.35rem;
+  font-size: clamp(3rem, 5vw, 4.2rem) !important;
+  line-height: 1.05;
+  color: #0f172a;
+  font-weight: 400 !important;
+  letter-spacing: -0.03em;
+}
+
+.templates-hero__subtitle {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.section-label {
+  margin: 0;
+  padding: 0 0.2rem;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 1rem;
+}
+
+.template-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.template-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(14, 165, 233, 0.28);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+}
+
+.template-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  margin-bottom: 0.9rem;
+  border-radius: 16px;
+  font-size: 1.2rem;
+}
+
+.template-card h2 {
+  margin: 0 0 0.45rem;
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.template-description {
+  flex: 1;
+  margin: 0 0 1rem;
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.template-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: auto;
+}
+
+.template-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.38rem 0.7rem;
+  border-radius: 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.template-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0d5c73 0%, #1f8f6a 100%);
+  color: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(13, 92, 115, 0.16);
+}
+
+.template-button__icon {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .template-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .template-button {
+    justify-content: center;
+  }
+}

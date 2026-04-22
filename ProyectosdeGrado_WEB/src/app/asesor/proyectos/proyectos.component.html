@@ -1,0 +1,109 @@
+<section class="projects-page">
+  <header class="page-header hero-card">
+    <div>
+      <p class="eyebrow">Seguimiento integral</p>
+      <h1>Proyectos asignados</h1>
+      <p>Consulte el estado de cada trabajo y abra su detalle fase por fase.</p>
+    </div>
+  </header>
+
+  <mat-card class="filters-card">
+    <mat-card-content class="filters-grid">
+      <div class="filter-field">
+        <span class="filter-field__label">Buscar</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Buscar</mat-label>
+          <input matInput [value]="search()" (input)="search.set($any($event.target).value)" placeholder="Estudiante o proyecto" />
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Modalidad</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Modalidad</mat-label>
+          <mat-select [value]="modalityFilter()" (valueChange)="modalityFilter.set($event)">
+            <mat-option value="todas">Todas</mat-option>
+            <mat-option value="Investigación">Investigación</mat-option>
+            <mat-option value="Interacción Social">Interacción Social</mat-option>
+            <mat-option value="Pasantía">Pasantía</mat-option>
+            <mat-option value="Proyecto de Desarrollo de Software">Proyecto de Desarrollo de Software</mat-option>
+            <mat-option value="Proyecto de Intervención">Proyecto de Intervención</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Fase</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Fase</mat-label>
+          <mat-select [value]="phaseFilter()" (valueChange)="phaseFilter.set($event)">
+            @for (option of phaseOptions; track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Estado</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select [value]="statusFilter()" (valueChange)="statusFilter.set($event)">
+            @for (option of statusOptions; track option.value) {
+              <mat-option [value]="option.value">{{ option.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="layout">
+    <div class="list-column">
+      <div class="project-list">
+        @for (project of filteredProjects(); track project.id) {
+          <mat-card class="project-card" [class.selected]="selectedProject().id === project.id">
+            <mat-card-content>
+              <div class="project-topline">
+                <div>
+                  <h3>{{ project.nombre }}</h3>
+                  <p>{{ project.estudiantes.join(', ') }}</p>
+                </div>
+                <mat-chip>{{ statusLabel(project.estado) }}</mat-chip>
+              </div>
+
+              <div class="project-meta">
+                <span>{{ project.modalidad }} · {{ project.subtipo }}</span>
+                <span>{{ phaseLabel(project.faseActual) }}</span>
+              </div>
+
+              <div class="progress-block">
+                <div class="progress-label">
+                  <span>Avance general</span>
+                  <strong>{{ project.progreso }}%</strong>
+                </div>
+                <mat-progress-bar mode="determinate" [value]="project.progreso"></mat-progress-bar>
+              </div>
+            </mat-card-content>
+            <mat-card-actions align="end">
+              <button mat-stroked-button color="primary" type="button" (click)="selectProject(project)">Ver detalle</button>
+            </mat-card-actions>
+          </mat-card>
+        } @empty {
+          <mat-card class="empty-card">
+            <mat-card-content>
+              <h3>Sin resultados</h3>
+              <p>No se encontraron proyectos con los filtros aplicados.</p>
+            </mat-card-content>
+          </mat-card>
+        }
+      </div>
+    </div>
+
+    <div class="detail-column">
+      @if (selectedProject(); as project) {
+        <app-proyecto-detalle [project]="project" />
+      }
+    </div>
+  </div>
+</section>

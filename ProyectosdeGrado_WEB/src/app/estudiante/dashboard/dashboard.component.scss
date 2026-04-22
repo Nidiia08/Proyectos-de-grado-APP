@@ -1,0 +1,261 @@
+.estudiante-dashboard {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2.5rem;
+  box-sizing: border-box;
+}
+
+.header-card {
+  margin-bottom: 1.75rem;
+}
+
+.header-grid {
+  display: grid;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .header-grid {
+    grid-template-columns: 1fr auto 1.2fr;
+    align-items: center;
+  }
+}
+
+.title {
+  margin: 0 0 0.25rem;
+  color: var(--mat-sys-on-surface);
+}
+
+.student-name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--mat-sys-primary);
+}
+
+.header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .header-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+}
+
+.meta-block {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.meta-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meta-value {
+  margin: 0;
+  color: var(--mat-sys-on-surface);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.status-chip-set {
+  margin-top: 0.35rem;
+}
+
+.status-chip {
+  --mdc-chip-elevated-container-color: var(--mat-sys-tertiary-container);
+  --mdc-chip-label-text-color: var(--mat-sys-on-tertiary-container);
+}
+
+.divider-mobile {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .divider-mobile {
+    display: block;
+    height: auto;
+    align-self: stretch;
+  }
+}
+
+.phases-section {
+  margin-top: 0.75rem;
+}
+
+.phases-section mat-card-content {
+  padding: 1.35rem 1.4rem 1.45rem !important;
+}
+
+.section-title {
+  margin: 0 0 0.45rem;
+  color: #0f172a;
+  font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+  font-weight: 700;
+}
+
+.section-hint {
+  margin: 0 0 1.4rem;
+  max-width: 48rem;
+  color: #475569;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.progress-summary {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.05rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(248, 251, 255, 0.96), rgba(243, 250, 247, 0.94));
+}
+
+.progress-summary__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.progress-summary__label {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: #64748b;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.progress-summary__top strong {
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.progress-summary__value {
+  color: #0d5c73;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.progress-summary__track {
+  position: relative;
+  overflow: hidden;
+  height: 0.95rem;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+}
+
+.progress-summary__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0ea5e9 0%, #0d5c73 45%, #22c55e 100%);
+  box-shadow: 0 8px 16px rgba(13, 92, 115, 0.18);
+}
+
+.stepper-wrap {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0 0.65rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.phase-stepper {
+  min-width: 46rem;
+}
+
+.phase-stepper ::ng-deep .mat-horizontal-content-container {
+  display: none;
+}
+
+.phase-stepper ::ng-deep .mat-horizontal-stepper-header-container {
+  padding: 0 0.35rem;
+}
+
+.phase-stepper ::ng-deep .mat-step-header {
+  min-height: 6.8rem;
+  padding-inline: 1rem;
+  pointer-events: none;
+  cursor: default;
+}
+
+.phase-stepper ::ng-deep .mat-step-icon {
+  width: 2.35rem;
+  height: 2.35rem;
+  margin-right: 0.7rem;
+}
+
+.phase-stepper ::ng-deep .mat-step-label {
+  max-width: 9rem;
+  text-decoration: none !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+
+.step-label {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.32;
+  text-align: center;
+  text-decoration: none !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+  white-space: normal;
+}
+
+.phase-stepper ::ng-deep .mat-step-header .mat-step-label,
+.phase-stepper ::ng-deep .mat-step-header .mat-step-label-active,
+.phase-stepper ::ng-deep .mat-step-header .mat-step-label-selected,
+.phase-stepper ::ng-deep .mat-step-header .mat-step-label.mat-step-label-active {
+  text-decoration: none !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+
+.step-label--done {
+  color: var(--mat-sys-tertiary);
+}
+
+.step-label--active {
+  color: var(--mat-sys-primary);
+  font-weight: 700;
+}
+
+.step-body-placeholder {
+  min-height: 0;
+}
+
+.loading-placeholder {
+  padding: 2rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+@media (max-width: 768px) {
+  .phases-section mat-card-content {
+    padding: 1.15rem 1rem 1.2rem !important;
+  }
+
+  .progress-summary__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .phase-stepper {
+    min-width: 40rem;
+  }
+}

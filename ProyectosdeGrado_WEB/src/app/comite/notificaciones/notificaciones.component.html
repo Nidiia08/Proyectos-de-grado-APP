@@ -1,0 +1,83 @@
+<section class="page notifications-page">
+  <header class="page-header hero-card">
+    <div>
+      <p class="eyebrow">Centro de alertas</p>
+      <h1>Notificaciones</h1>
+      <p>{{ unreadCount() }} no leídas.</p>
+    </div>
+    <button mat-flat-button color="primary" type="button" (click)="markAllRead()">Marcar todas como leídas</button>
+  </header>
+
+  <mat-card class="filters">
+    <mat-card-content class="filters-grid">
+      <div class="filter-field">
+        <span class="filter-field__label">Estado</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <mat-select [value]="mode()" (valueChange)="mode.set($event)">
+            <mat-option value="all">Todas</mat-option>
+            <mat-option value="unread">No leídas</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Fase</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Fase</mat-label>
+          <mat-select [value]="phaseFilter()" (valueChange)="phaseFilter.set($event)">
+            <mat-option value="todas">Todas</mat-option>
+            <mat-option value="Inscripción">Inscripción</mat-option>
+            <mat-option value="Aprobación">Aprobación</mat-option>
+            <mat-option value="Desarrollo">Desarrollo</mat-option>
+            <mat-option value="Culminación">Culminación</mat-option>
+            <mat-option value="Evaluación">Evaluación</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Modalidad</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Modalidad</mat-label>
+          <mat-select [value]="modalityFilter()" (valueChange)="modalityFilter.set($event)">
+            <mat-option value="todas">Todas</mat-option>
+            <mat-option value="Investigación">Investigación</mat-option>
+            <mat-option value="Interacción Social">Interacción Social</mat-option>
+            <mat-option value="Pasantía">Pasantía</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-field">
+        <span class="filter-field__label">Proyecto</span>
+        <mat-form-field appearance="outline">
+          <mat-label>Proyecto</mat-label>
+          <input matInput [value]="projectFilter()" (input)="projectFilter.set($any($event.target).value)" />
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="list">
+    @for (notification of notifications(); track notification.id) {
+      <mat-card class="card" [class.unread]="!notification.leida">
+        <mat-card-content class="layout">
+          <div class="icon-box"><mat-icon>{{ comite.getNotificationIcon(notification.tipo) }}</mat-icon></div>
+          <div>
+            <h3>{{ notification.titulo }}</h3>
+            <p>{{ notification.descripcion }}</p>
+            <div class="meta">
+              <span>{{ notification.proyecto }}</span>
+              <span>{{ notification.estudiante }}</span>
+              <span>{{ comite.formatDateTime(notification.fechaHora) }}</span>
+            </div>
+          </div>
+          <button mat-stroked-button color="primary" type="button" (click)="goToProject(notification.projectId, notification.id)">
+            Ir al proyecto
+          </button>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+</section>

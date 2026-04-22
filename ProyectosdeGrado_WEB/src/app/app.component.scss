@@ -1,0 +1,60 @@
+:host {
+  display: block;
+  height: 100%;
+  position: relative;
+  isolation: isolate;
+}
+
+:host::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(180deg, rgba(247, 250, 252, 0.9) 0%, rgba(244, 248, 250, 0.92) 100%),
+    url('../img/image.png') center 5rem / min(48rem, 78vw) no-repeat;
+  pointer-events: none;
+}
+
+:host::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at top right, rgba(13, 92, 115, 0.05), transparent 22%),
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.2), transparent 38%);
+  pointer-events: none;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 17.5rem minmax(0, 1fr);
+  min-height: 100vh;
+  background: transparent;
+}
+
+.app-shell__main {
+  min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+@media (max-width: 960px) {
+  :host::before {
+    background:
+      linear-gradient(180deg, rgba(247, 250, 252, 0.92) 0%, rgba(244, 248, 250, 0.94) 100%),
+      url('../img/image.png') center 7rem / min(32rem, 88vw) no-repeat;
+  }
+
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell__main {
+    height: auto;
+    min-height: 100vh;
+    padding: 0.35rem;
+  }
+}

@@ -1,0 +1,10 @@
+@if (showSidebar()) {
+  <div class="app-shell">
+    <app-sidebar />
+    <main class="app-shell__main">
+      <router-outlet />
+    </main>
+  </div>
+} @else {
+  <router-outlet />
+}

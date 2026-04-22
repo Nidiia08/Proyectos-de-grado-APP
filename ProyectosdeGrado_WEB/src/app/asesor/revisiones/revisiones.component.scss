@@ -1,0 +1,100 @@
+:host {
+  --advisor-blue: #003087;
+  --advisor-green: #1d9e75;
+  display: block;
+}
+
+.reviews-page {
+  padding: 1.5rem;
+  min-height: 100%;
+  background: linear-gradient(180deg, #eef5fb 0%, #ffffff 48%);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--advisor-green);
+}
+
+.page-header h1 {
+  margin: 0.25rem 0 0;
+  color: var(--advisor-blue);
+}
+
+.page-header p {
+  margin: 0.35rem 0 0;
+  color: #4b5563;
+}
+
+.tabs-card,
+.review-card {
+  border-radius: 1rem;
+}
+
+.tabs-card {
+  margin-top: 1rem;
+}
+
+.tab-panel {
+  display: grid;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.review-card h3 {
+  margin: 0;
+}
+
+.review-card p {
+  margin: 0.35rem 0 0;
+}
+
+.support-text {
+  color: #4b5563;
+}
+
+.doc-list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+
+.doc-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.85rem;
+  background: #f6f9fc;
+  color: #374151;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.empty-state {
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: #f5f8fc;
+  color: #4b5563;
+}
+
+@media (max-width: 768px) {
+  .reviews-page {
+    padding: 1rem;
+  }
+
+  .doc-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

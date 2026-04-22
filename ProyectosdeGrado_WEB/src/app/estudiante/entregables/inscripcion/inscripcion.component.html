@@ -1,0 +1,123 @@
+@if (access === 'locked') {
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      <p class="locked-msg">Esta fase aun no esta disponible.</p>
+    </mat-card-content>
+  </mat-card>
+} @else {
+  @if (model(); as m) {
+    <div class="phase-inscripcion">
+      @if (access === 'readonly') {
+        <mat-card class="readonly-banner" appearance="outlined">
+          <mat-card-content>Esta fase ya fue completada y se muestra en modo de solo lectura.</mat-card-content>
+        </mat-card>
+      }
+
+      <mat-card class="banner-deadline" appearance="outlined">
+        <mat-card-content class="banner-inner">
+          <mat-icon>event</mat-icon>
+          <div>
+            <strong>Fecha limite (Comite Curricular)</strong>
+            <p>{{ formatDate(m.committeeDeadlineIso) }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      @if (m.isGroupProject) {
+        <mat-card class="notice" appearance="outlined">
+          <mat-card-content>
+            <p>
+              <strong>Trabajo en grupo:</strong> cada integrante debe cargar de forma individual el Estudio de Hoja de
+              Vida y el Certificado de Matricula.
+            </p>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      @if (submittedLocal || m.submitted || m.pendingReview) {
+        <mat-card class="sent-banner" appearance="outlined">
+          <mat-card-content>
+            Estado:
+            <strong>Enviado - pendiente de revision</strong>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <h2 class="section-title">Documentos requeridos</h2>
+      <p class="formats">Formatos permitidos: PDF, DOCX, JPG, PNG.</p>
+
+      @for (slot of slots; track slot.definition.id) {
+        <mat-card class="doc-card" appearance="outlined">
+          <mat-card-content>
+            <div class="doc-head">
+              <div>
+                <span class="doc-label">{{ slot.definition.label }}</span>
+                <mat-chip-set>
+                  <mat-chip [highlighted]="slot.definition.required">
+                    {{ slot.definition.required ? 'Requerido' : 'Opcional' }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+              <span class="status" [class.status--ok]="slot.status === 'uploaded'">{{ statusLabel(slot) }}</span>
+            </div>
+            <mat-divider />
+            <div class="doc-actions">
+              @if (slot.status === 'uploaded' && slot.fileName) {
+                <p class="fname">{{ slot.fileName }}</p>
+              }
+              <input
+                type="file"
+                hidden
+                [id]="'file-' + slot.definition.id"
+                accept=".pdf,.docx,.jpg,.jpeg,.png"
+                (change)="onFileSelected(slot, $event)"
+                [disabled]="!canEdit"
+              />
+              @if (canEdit) {
+                @if (slot.status === 'uploaded') {
+                  <button mat-stroked-button type="button" (click)="replace(slot)">Quitar archivo</button>
+                }
+                <button
+                  mat-flat-button
+                  color="primary"
+                  type="button"
+                  (click)="openPicker(slot.definition.id)"
+                >
+                  {{ slot.status === 'uploaded' ? 'Cambiar archivo' : 'Seleccionar archivo' }}
+                </button>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <div class="comment-box">
+        <label class="comment-box__label" for="inscripcion-comment">Comentario u observacion adicional</label>
+        <p class="comment-box__hint">Opcional. Puedes usar este espacio para aclaraciones o detalles importantes.</p>
+        <textarea
+          id="inscripcion-comment"
+          class="comment-box__textarea"
+          rows="4"
+          [(ngModel)]="comment"
+          [readonly]="!canEdit"
+          [disabled]="!canEdit"
+          placeholder="Escribe aqui tu comentario..."
+        ></textarea>
+      </div>
+
+      <div class="submit-row">
+        <button
+          mat-flat-button
+          color="primary"
+          type="button"
+          (click)="enviar()"
+          [disabled]="!canEdit || !allRequiredUploaded"
+        >
+          Enviar entregables
+        </button>
+      </div>
+    </div>
+  } @else {
+    <p class="loading">Cargando fase de inscripcion...</p>
+  }
+}

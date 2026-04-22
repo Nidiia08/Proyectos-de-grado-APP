@@ -1,0 +1,100 @@
+@if (access === 'locked') {
+  <mat-card appearance="outlined"><mat-card-content><p class="muted">Esta fase aun no esta disponible.</p></mat-card-content></mat-card>
+} @else {
+  @if (model(); as m) {
+    <div class="evaluacion">
+      @if (access === 'readonly') {
+        <mat-card class="readonly-banner" appearance="outlined">
+          <mat-card-content>Esta fase ya fue completada y se muestra en modo de solo lectura.</mat-card-content>
+        </mat-card>
+      }
+
+      <h2 class="h2">Rubrica de evaluacion (solo lectura)</h2>
+      @for (bloque of m.rubrica; track bloque.titulo) {
+        <mat-card class="rubric-block" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>{{ bloque.titulo }} - maximo {{ bloque.puntosMaximoBloque }} puntos</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table mat-table [dataSource]="bloque.items" class="rubric-table">
+              <ng-container matColumnDef="criterio">
+                <th mat-header-cell *matHeaderCellDef>Criterio</th>
+                <td mat-cell *matCellDef="let row">{{ row.nombre }}</td>
+              </ng-container>
+              <ng-container matColumnDef="puntos">
+                <th mat-header-cell *matHeaderCellDef class="num">Puntos max.</th>
+                <td mat-cell *matCellDef="let row" class="num">{{ row.puntosMax }}</td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <p class="minimos">
+        Total maximo: 100 puntos. Minimo aprobatorio: {{ m.minimoAprobatorio }} (min. {{ m.minimoDocumento }} en documento
+        escrito + min. {{ m.minimoSustentacion }} en sustentacion).
+      </p>
+
+      <h2 class="h2">Estado del proceso</h2>
+      <mat-stepper orientation="vertical" [linear]="false" class="timeline-stepper">
+        @for (p of m.timeline; track p.id) {
+          <mat-step [completed]="p.estado === 'completado'" [editable]="false">
+            <ng-template matStepLabel>{{ p.label }}</ng-template>
+            <div class="step-detail">
+              <mat-chip-set>
+                <mat-chip [highlighted]="p.estado === 'en_curso'">{{ estadoPaso(p) }}</mat-chip>
+              </mat-chip-set>
+              @if (p.detalle) {
+                <p>{{ p.detalle }}</p>
+              }
+            </div>
+          </mat-step>
+        }
+      </mat-stepper>
+
+      @if (m.publicacion.aplica) {
+        <mat-card class="pub" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>Publicacion en revista indexada (modalidad investigacion)</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            @if (m.publicacion.clasificacion && m.publicacion.puntajeAutomatico !== null) {
+              <p>
+                Clasificacion: <strong>{{ clasificacionLabel() }}</strong> - Calificacion automatica asociada:
+                <strong>{{ m.publicacion.puntajeAutomatico }}</strong> puntos.
+              </p>
+            } @else {
+              <p class="muted">Sin datos de publicacion indexada en el mock.</p>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+
+      @if (m.resultado.visible) {
+        <mat-card class="result" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>Resultado final</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <ul class="res-list">
+              <li>Documento escrito: <strong>{{ m.resultado.puntajeDocumento }}</strong></li>
+              <li>Sustentacion: <strong>{{ m.resultado.puntajeSustentacion }}</strong></li>
+              <li>Total: <strong>{{ m.resultado.total }}</strong></li>
+              <li>Estado: <strong>{{ resultadoLabel() }}</strong></li>
+            </ul>
+          </mat-card-content>
+        </mat-card>
+      } @else {
+        <mat-card appearance="outlined">
+          <mat-card-content>
+            <p class="muted">El resultado final se mostrara cuando el proceso de evaluacion haya concluido.</p>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  } @else {
+    <p class="muted">Cargando evaluacion...</p>
+  }
+}

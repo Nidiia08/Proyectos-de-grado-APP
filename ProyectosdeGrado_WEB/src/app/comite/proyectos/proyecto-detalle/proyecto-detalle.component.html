@@ -1,0 +1,138 @@
+<section class="detail-shell">
+  <mat-card class="detail-card">
+    <mat-card-header><mat-card-title>Información general</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <h2>{{ project.nombre }}</h2>
+      <p>{{ project.estudiantes.join(', ') }} · {{ project.modalidad }} / {{ project.subtipo }}</p>
+      <p><strong>Asesor:</strong> {{ project.asesor }}</p>
+      <p><strong>Estado:</strong> {{ comite.getStatusLabel(project.estado) }}</p>
+      <p><strong>Fase activa:</strong> {{ comite.getPhaseLabel(project.faseActual) }}</p>
+      <p><strong>Historial de acuerdos:</strong></p>
+      <mat-list>
+        @for (acuerdo of project.acuerdos; track acuerdo.id) {
+          <mat-list-item>{{ acuerdo.numero }} · {{ acuerdo.tipo }} · {{ comite.formatDate(acuerdo.fecha) }}</mat-list-item>
+        } @empty {
+          <mat-list-item>No hay acuerdos registrados.</mat-list-item>
+        }
+      </mat-list>
+      <button mat-stroked-button color="primary" type="button">Editar información general</button>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="detail-card">
+    <mat-card-content>
+      <mat-stepper orientation="vertical" [linear]="false">
+        <mat-step>
+          <ng-template matStepLabel>Fase 1 — Inscripción</ng-template>
+          <div class="phase-block">
+            <mat-list>
+              @for (doc of project.inscripcion.documentos; track doc.id) {
+                <mat-list-item>{{ doc.nombre }} · {{ doc.estado }} · {{ comite.formatDate(doc.fecha) }}</mat-list-item>
+              }
+            </mat-list>
+            <p><strong>Comentario estudiante:</strong> {{ project.infoGeneral.comentarioEstudiante }}</p>
+            <p><strong>Fecha límite:</strong> {{ comite.formatDate(project.inscripcion.fechaLimite) }}</p>
+            <button mat-flat-button color="primary" type="button" (click)="assignReviewers()">Aprobar inscripción y asignar jurados revisores</button>
+            <button mat-stroked-button color="warn" type="button" (click)="requestCorrections('Inscripción')">Solicitar correcciones</button>
+          </div>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel>Fase 2 — Aprobación</ng-template>
+          <div class="phase-block">
+            @for (it of project.aprobacion.iteraciones; track it.id) {
+              <div class="tile">
+                <strong>Iteración {{ it.numero }}</strong>
+                <p>{{ it.documento }} · {{ it.estado }}</p>
+                <p>Días hábiles restantes: {{ it.diasRestantes }}</p>
+              </div>
+            } @empty {
+              <p>Sin iteraciones registradas.</p>
+            }
+            @if (project.aprobacion.actaCompromiso) {
+              <p><strong>Acta de compromiso:</strong> {{ project.aprobacion.actaCompromiso }}</p>
+            }
+            <button mat-flat-button color="primary" type="button" (click)="emitProjectApproval()">Emitir Acuerdo de Aprobación del proyecto</button>
+          </div>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel>Fase 3 — Desarrollo</ng-template>
+          <div class="phase-block">
+            @for (report of project.desarrollo.informes; track report.id) {
+              <div class="tile">
+                <strong>Informe {{ report.numero }}</strong>
+                <p>{{ report.periodo }} · {{ report.estado }}</p>
+                <p>Fecha límite: {{ comite.formatDate(report.fechaLimite) }}</p>
+              </div>
+            } @empty {
+              <p>Sin informes registrados.</p>
+            }
+            <div class="grid-form">
+              <mat-form-field appearance="outline"><mat-label>Nueva fecha de prórroga</mat-label><input matInput type="date" [(ngModel)]="extensionDate" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Motivo</mat-label><input matInput [(ngModel)]="extensionReason" /></mat-form-field>
+            </div>
+            <button mat-flat-button color="primary" type="button" (click)="registerExtension()">Registrar prórroga</button>
+          </div>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel>Fase 4 — Culminación</ng-template>
+          <div class="phase-block">
+            <mat-list>
+              @for (doc of project.culminacion.documentos; track doc.id) {
+                <mat-list-item>{{ doc.nombre }} · {{ doc.estado }}</mat-list-item>
+              } @empty {
+                <mat-list-item>No hay documentos finales.</mat-list-item>
+              }
+            </mat-list>
+            <p><strong>Enlace en la nube:</strong> {{ project.culminacion.enlaceNube || 'No aplica' }}</p>
+            <p><strong>Carta asesor verificada:</strong> {{ project.culminacion.cartaAsesor ? 'Sí' : 'No' }}</p>
+            <p><strong>Aval entidad receptora:</strong> {{ project.culminacion.avalEntidad ? 'Sí' : 'No' }}</p>
+            <button mat-flat-button color="primary" type="button" (click)="assignEvaluators()">Aprobar documentos de culminación y asignar jurados evaluadores</button>
+            <button mat-stroked-button color="warn" type="button" (click)="requestCorrections('Culminación')">Solicitar correcciones</button>
+          </div>
+        </mat-step>
+
+        <mat-step>
+          <ng-template matStepLabel>Fase 5 — Evaluación</ng-template>
+          <div class="phase-block">
+            <p><strong>Sustentación privada:</strong> {{ project.evaluacion.sustentacionPrivada ? comite.formatDateTime(project.evaluacion.sustentacionPrivada) : 'Sin programar' }}</p>
+            <p><strong>Socialización pública:</strong> {{ project.evaluacion.socializacionPublica ? comite.formatDateTime(project.evaluacion.socializacionPublica) : 'Sin programar' }}</p>
+            <p><strong>Asistentes:</strong> {{ project.evaluacion.asistentesSocializacion }}</p>
+            <p><strong>Nota final:</strong> {{ project.evaluacion.notaFinal ?? 'Pendiente' }}</p>
+            <p><strong>Concepto final:</strong> {{ project.evaluacion.conceptoFinal ?? 'Pendiente' }}</p>
+            <mat-list>
+              @for (score of project.evaluacion.calificaciones; track score.jurado) {
+                <mat-list-item>{{ score.jurado }} · {{ score.nota }} · {{ comite.formatDateTime(score.fecha) }}</mat-list-item>
+              } @empty {
+                <mat-list-item>Sin calificaciones registradas.</mat-list-item>
+              }
+            </mat-list>
+            <div class="grid-form">
+              <mat-form-field appearance="outline"><mat-label>Fecha y hora privada</mat-label><input matInput type="datetime-local" [(ngModel)]="schedulePrivate" /></mat-form-field>
+              <mat-form-field appearance="outline"><mat-label>Fecha y hora pública</mat-label><input matInput type="datetime-local" [(ngModel)]="schedulePublic" /></mat-form-field>
+            </div>
+            <button mat-stroked-button color="primary" type="button" (click)="scheduleDefense()">Registrar fechas de sustentación</button>
+            <button mat-flat-button color="primary" type="button" [disabled]="project.evaluacion.calificaciones.length < 2 || project.evaluacion.actaFinalGenerada" (click)="generateFinalAct()">Generar acta de evaluación final</button>
+          </div>
+        </mat-step>
+      </mat-stepper>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="detail-card">
+    <mat-card-header><mat-card-title>Historial</mat-card-title></mat-card-header>
+    <mat-card-content>
+      @for (entry of project.historial; track entry.id) {
+        <div class="tile">
+          <strong>{{ entry.accion }}</strong>
+          <p>{{ entry.detalle }}</p>
+          <span>{{ entry.usuario }} · {{ comite.formatDateTime(entry.fechaHora) }}</span>
+        </div>
+      } @empty {
+        <p>No hay acciones registradas.</p>
+      }
+    </mat-card-content>
+  </mat-card>
+</section>

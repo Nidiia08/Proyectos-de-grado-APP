@@ -1,0 +1,204 @@
+<section class="detail-shell">
+  <header class="detail-header">
+    <div>
+      <h2>{{ project.nombre }}</h2>
+      <p>{{ project.estudiantes.join(', ') }} · {{ project.modalidad }} / {{ project.subtipo }}</p>
+    </div>
+    <mat-chip class="role-chip">{{ jurado.getRolLabel(project.rolJurado) }}</mat-chip>
+  </header>
+
+  <mat-card class="detail-card">
+    <mat-card-content>
+      <mat-stepper orientation="vertical" [linear]="false">
+        @if (canReviewProposal) {
+          <mat-step [completed]="hasApprovedIteration()">
+            <ng-template matStepLabel>Fase Aprobación</ng-template>
+            <div class="phase-block">
+              @for (iteration of project.iteraciones; track iteration.id) {
+                <mat-expansion-panel class="iteration-panel">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title>Iteración {{ iteration.numero }} de {{ iteration.maximo }}</mat-panel-title>
+                    <mat-panel-description>{{ iteration.estado }}</mat-panel-description>
+                  </mat-expansion-panel-header>
+
+                  <div class="iteration-content">
+                    <p><strong>Documento recibido:</strong> {{ iteration.archivo }}</p>
+                    <p><strong>Comentario del estudiante:</strong> {{ iteration.comentarioEstudiante }}</p>
+                    <p><strong>Días hábiles para responder:</strong> {{ iteration.diasHabilesRestantes }}</p>
+
+                    @if (iteration.estado === 'pendiente_revision') {
+                      <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Observaciones del jurado</mat-label>
+                        <textarea rows="4" #reviewObservation matInput></textarea>
+                      </mat-form-field>
+
+                      <div class="action-row">
+                        <button mat-stroked-button color="primary" type="button" (click)="sendObservations(iteration, reviewObservation.value)">
+                          Emitir observaciones
+                        </button>
+                        <button mat-flat-button color="primary" type="button" (click)="approveProposal(iteration, reviewObservation.value)">
+                          Aprobar propuesta
+                        </button>
+                      </div>
+                    } @else {
+                      <p><strong>Respuesta del jurado:</strong> {{ iteration.observacionesJurado || 'Sin observaciones adicionales.' }}</p>
+                      <p><strong>Fecha:</strong> {{ iteration.fechaRespuesta ? jurado.formatDateTime(iteration.fechaRespuesta) : 'Sin registro' }}</p>
+                    }
+                  </div>
+                </mat-expansion-panel>
+              } @empty {
+                <p class="empty-copy">Este proyecto no tiene participación en la fase de aprobación.</p>
+              }
+            </div>
+          </mat-step>
+        }
+
+        @if (canEvaluate) {
+          <mat-step [completed]="project.evaluacion.revisionConfirmada">
+            <ng-template matStepLabel>Paso 1 — Revisión del informe final</ng-template>
+            <div class="phase-block">
+              <p><strong>Informe principal:</strong> {{ project.evaluacion.informePrincipal }}</p>
+              <p><strong>Anexos:</strong> {{ project.evaluacion.anexos.join(', ') || 'Sin anexos' }}</p>
+              <p><strong>Enlace en la nube:</strong> {{ project.evaluacion.enlaceNube || 'No aplica' }}</p>
+
+              @if (!project.evaluacion.revisionConfirmada) {
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Observaciones de revisión</mat-label>
+                  <textarea rows="4" #reviewFinal matInput></textarea>
+                </mat-form-field>
+                <button mat-flat-button color="primary" type="button" (click)="confirmReportReview(reviewFinal.value)">
+                  Confirmar recepción y revisión
+                </button>
+              } @else {
+                <p><strong>Registro:</strong> {{ project.evaluacion.observacionesRevision || 'Recepción confirmada.' }}</p>
+              }
+            </div>
+          </mat-step>
+
+          <mat-step [completed]="!!project.evaluacion.retroalimentacionPrevia">
+            <ng-template matStepLabel>Paso 2 — Retroalimentación al estudiante</ng-template>
+            <div class="phase-block">
+              <p><strong>Ronda actual:</strong> {{ project.evaluacion.rondaRetroalimentacion }}</p>
+              <p><strong>Días hábiles disponibles para ajustes:</strong> {{ project.evaluacion.diasAjusteRestantes }}</p>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Observaciones previas a sustentación</mat-label>
+                <textarea rows="4" #feedbackField matInput>{{ project.evaluacion.retroalimentacionPrevia }}</textarea>
+              </mat-form-field>
+
+              <button mat-stroked-button color="primary" type="button" (click)="sendFeedback(feedbackField.value)">
+                Enviar retroalimentación
+              </button>
+            </div>
+          </mat-step>
+
+          <mat-step [completed]="project.evaluacion.avalEmitido">
+            <ng-template matStepLabel>Paso 3 — Aval de sustentación</ng-template>
+            <div class="phase-block">
+              <p><strong>Sustentación programada:</strong> {{ project.evaluacion.sustentacionProgramada ? jurado.formatDateTime(project.evaluacion.sustentacionProgramada) : 'Sin fecha programada' }}</p>
+
+              @if (!project.evaluacion.avalEmitido) {
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Observación opcional para el aval</mat-label>
+                  <textarea rows="4" #avalField matInput></textarea>
+                </mat-form-field>
+                <button mat-flat-button color="primary" type="button" (click)="emitAval(avalField.value)">
+                  Emitir aval de sustentación y socialización
+                </button>
+              } @else {
+                <p><strong>Fecha del aval:</strong> {{ project.evaluacion.fechaAval ? jurado.formatDateTime(project.evaluacion.fechaAval) : 'Sin registro' }}</p>
+                <p><strong>Observación:</strong> {{ project.evaluacion.observacionAval || 'Sin observación adicional' }}</p>
+              }
+            </div>
+          </mat-step>
+
+          <mat-step [completed]="project.evaluacion.calificacionEnviada">
+            <ng-template matStepLabel>Paso 4 — Calificación final</ng-template>
+            <div class="phase-block">
+              <form [formGroup]="scoreForm" class="score-form">
+                <div class="score-section">
+                  <h3>Documento escrito — 60 puntos máximo</h3>
+                  <div class="score-grid">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Cumplimiento de objetivos</mat-label>
+                      <input matInput type="number" formControlName="objetivos" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Originalidad, ingenio y creatividad</mat-label>
+                      <input matInput type="number" formControlName="originalidad" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Validez y alcance de conclusiones</mat-label>
+                      <input matInput type="number" formControlName="conclusiones" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Organización y presentación</mat-label>
+                      <input matInput type="number" formControlName="organizacion" />
+                    </mat-form-field>
+                  </div>
+                  <p class="subtotal">Subtotal documento escrito: {{ documentoSubtotal() }}/60</p>
+                </div>
+
+                <div class="score-section">
+                  <h3>Sustentación — 40 puntos máximo</h3>
+                  <div class="score-grid">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Sustentación privada</mat-label>
+                      <input matInput type="number" formControlName="sustentacionPrivada" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Socialización pública</mat-label>
+                      <input matInput type="number" formControlName="socializacionPublica" />
+                    </mat-form-field>
+                  </div>
+                  <p class="subtotal">Subtotal sustentación: {{ sustentacionSubtotal() }}/40</p>
+                </div>
+
+                <div class="total-box" [class.total-box--ok]="approved()" [class.total-box--warn]="!approved()">
+                  <strong>Total general: {{ total() }}/100</strong>
+                  <span>{{ approved() ? 'Aprobado' : 'Reprobado o sin mínimos requeridos' }}</span>
+                </div>
+
+                @if (!jurado.cumpleMinimos(currentRubric())) {
+                  <p class="warning-copy">Debe cumplir mínimos: documento escrito 36 puntos y sustentación 24 puntos.</p>
+                }
+
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Observaciones finales</mat-label>
+                  <textarea matInput rows="4" formControlName="observacionesFinales"></textarea>
+                </mat-form-field>
+
+                @if (!project.evaluacion.calificacionEnviada) {
+                  <button mat-flat-button color="primary" type="button" (click)="submitGrade()">Enviar calificación</button>
+                } @else {
+                  <p class="empty-copy">La calificación definitiva ya fue registrada y el formulario quedó en solo lectura.</p>
+                }
+              </form>
+            </div>
+          </mat-step>
+        }
+      </mat-stepper>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="detail-card">
+    <mat-card-header>
+      <mat-card-title>Historial del proyecto</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      @if (project.historial.length) {
+        <div class="history-list">
+          @for (entry of project.historial; track entry.id) {
+            <div class="history-entry">
+              <strong>{{ entry.accion }}</strong>
+              <p>{{ entry.detalle }}</p>
+              <span>{{ jurado.formatDateTime(entry.fechaHora) }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="empty-copy">Las acciones del jurado se registrarán aquí.</p>
+      }
+    </mat-card-content>
+  </mat-card>
+</section>

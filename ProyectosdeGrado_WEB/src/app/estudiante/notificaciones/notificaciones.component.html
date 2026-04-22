@@ -1,0 +1,42 @@
+<section class="notifications-page">
+  <header class="hero-card page-hero">
+    <div class="page-hero__copy">
+      <span class="eyebrow">Centro de alertas</span>
+      <h1>Notificaciones</h1>
+      <p>Consulta avisos del sistema y del programa con el mismo formato visual del espacio de entregables.</p>
+    </div>
+
+    @if (noLeidas > 0) {
+      <div class="hero-date">
+        {{ noLeidas }} nueva{{ noLeidas === 1 ? '' : 's' }}
+      </div>
+    }
+  </header>
+
+  @if (noLeidas > 0) {
+    <p class="section-label">Recientes</p>
+  }
+
+  <div class="notification-list">
+    @for (n of notificaciones; track n.titulo; let idx = $index) {
+      @if (idx === noLeidas && noLeidas > 0) {
+        <p class="section-label section-label--spaced">Anteriores</p>
+      }
+
+      <article class="notification-card" [class.notification-card--unread]="!n.leida">
+        <div class="notification-card__dot" [class.notification-card__dot--read]="n.leida"></div>
+
+        <div class="notification-card__copy">
+          <div class="notification-card__top">
+            <h2>{{ n.titulo }}</h2>
+            <span class="notification-card__badge" [class.notification-card__badge--read]="n.leida">
+              {{ n.leida ? 'Leída' : 'Nueva' }}
+            </span>
+          </div>
+
+          <p class="notification-card__time">{{ n.fechaRelativa }}</p>
+        </div>
+      </article>
+    }
+  </div>
+</section>

@@ -1,0 +1,206 @@
+:host {
+  --jury-blue: #003087;
+  --jury-green: #1d9e75;
+  --jury-purple: #6b46c1;
+  --jury-yellow: #f2b632;
+  --jury-orange: #ef8f21;
+  --jury-gray: #6b7280;
+  display: block;
+}
+
+.jury-page {
+  min-height: 100%;
+  padding: 1.5rem;
+  background: linear-gradient(180deg, #eef4fb 0%, #ffffff 46%);
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  color: #fff;
+  background: linear-gradient(135deg, var(--jury-blue), var(--jury-green));
+  box-shadow: 0 20px 40px rgba(0, 48, 135, 0.18);
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  opacity: 0.9;
+}
+
+.hero h1 {
+  margin: 0.3rem 0 0;
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
+}
+
+.subtitle {
+  margin: 0.45rem 0 0;
+  opacity: 0.92;
+}
+
+.date-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.metric-card {
+  border-radius: 1rem;
+  border-top: 4px solid transparent;
+}
+
+.metric-card p {
+  margin: 0;
+  color: #4b5563;
+}
+
+.metric-card strong {
+  display: block;
+  margin-top: 0.7rem;
+  font-size: 2rem;
+}
+
+.accent-blue { border-top-color: var(--jury-blue); }
+.accent-yellow { border-top-color: var(--jury-yellow); }
+.accent-green { border-top-color: var(--jury-green); }
+.accent-indigo { border-top-color: var(--jury-purple); }
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.panel-card {
+  border-radius: 1.2rem;
+}
+
+.alert-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.alert-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #f4f7fb;
+}
+
+.alert-copy h3 {
+  margin: 0.35rem 0;
+}
+
+.alert-copy p,
+.empty-copy {
+  margin: 0;
+  color: #4b5563;
+}
+
+.deadline-chip {
+  margin-top: 0.7rem;
+  background: #fff0c2;
+  color: #8c6700;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.summary-table {
+  width: 100%;
+}
+
+.primary-text {
+  font-weight: 600;
+  color: #111827;
+}
+
+.secondary-text {
+  color: #6b7280;
+  font-size: 0.86rem;
+}
+
+.role-chip--blue {
+  background: #dce8ff;
+  color: var(--jury-blue);
+}
+
+.role-chip--green {
+  background: #d8f3e7;
+  color: #0f6f4f;
+}
+
+.role-chip--purple {
+  background: #ebe2ff;
+  color: var(--jury-purple);
+}
+
+.status-chip--yellow {
+  background: #fff0c2;
+  color: #8c6700;
+}
+
+.status-chip--orange {
+  background: #ffe2c7;
+  color: #aa5d00;
+}
+
+.status-chip--green {
+  background: #d8f3e7;
+  color: #0f6f4f;
+}
+
+.status-chip--blue {
+  background: #dce8ff;
+  color: var(--jury-blue);
+}
+
+.status-chip--gray {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+@media (max-width: 1100px) {
+  .metric-grid,
+  .content-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .jury-page {
+    padding: 1rem;
+  }
+
+  .hero,
+  .alert-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .metric-grid,
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
