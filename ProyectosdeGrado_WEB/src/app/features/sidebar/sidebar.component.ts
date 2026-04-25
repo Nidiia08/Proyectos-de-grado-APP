@@ -39,6 +39,7 @@ export class SidebarComponent {
     if (role === 'student') {
       return [
         { id: 'dashboard', label: 'Dashboard', icon: 'D' },
+        { id: 'perfil', label: 'Mi perfil', icon: '👤' },
         { id: 'templates', label: 'Plantillas', icon: 'P' },
         { id: 'notifications', label: 'Notificaciones', icon: 'N' },
         { id: 'deliverables', label: 'Entregables', icon: 'E' },
@@ -49,6 +50,7 @@ export class SidebarComponent {
     if (role === 'jury') {
       return [
         { id: 'dashboard', label: 'Dashboard', icon: 'D' },
+        { id: 'perfil', label: 'Mi perfil', icon: '👤' },
         { id: 'projects', label: 'Proyectos', icon: 'PR' },
         { id: 'templates', label: 'Plantillas', icon: 'P' },
         { id: 'notifications', label: 'Notificaciones', icon: 'N' },
@@ -60,11 +62,13 @@ export class SidebarComponent {
     const commonByRole: Record<string, MenuItem[]> = {
       professor: [
         { id: 'dashboard', label: 'Dashboard', icon: 'D' },
+        { id: 'perfil', label: 'Mi perfil', icon: '👤' },
         { id: 'templates', label: 'Plantillas', icon: 'P' },
         { id: 'notifications', label: 'Notificaciones', icon: 'N' },
       ],
       committee: [
         { id: 'dashboard', label: 'Dashboard', icon: 'D' },
+        { id: 'perfil', label: 'Mi perfil', icon: '👤' },
         { id: 'projects', label: 'Proyectos', icon: 'PR' },
         { id: 'templates', label: 'Plantillas', icon: 'P' },
         { id: 'notifications', label: 'Notificaciones', icon: 'N' },

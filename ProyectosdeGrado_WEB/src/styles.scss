@@ -313,7 +313,7 @@ button[mat-flat-button] {
 }
 
 .mat-mdc-form-field .mdc-notched-outline {
-  display: none !important;
+  display: block !important;
 }
 
 .mat-mdc-form-field:hover .mat-mdc-text-field-wrapper {

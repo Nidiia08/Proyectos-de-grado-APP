@@ -26,6 +26,7 @@ export class AppComponent {
   }
 
   private actualizarShell(url: string): void {
-    this.showSidebar.set(this.auth.estaAutenticado && !url.startsWith('/login'));
+    const isPublicShell = url.startsWith('/login') || url.startsWith('/cambiar-password');
+    this.showSidebar.set(this.auth.estaAutenticado && !isPublicShell);
   }
 }

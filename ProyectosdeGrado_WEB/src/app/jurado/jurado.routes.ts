@@ -11,6 +11,10 @@ export const JURADO_ROUTES: Routes = [
     loadComponent: () => import('./dashboard/dashboard.component').then((m) => m.DashboardComponent),
   },
   {
+    path: 'perfil',
+    loadComponent: () => import('../shared/perfil/perfil.component').then((m) => m.PerfilComponent),
+  },
+  {
     path: 'proyectos',
     loadComponent: () => import('./proyectos/proyectos.component').then((m) => m.ProyectosComponent),
   },

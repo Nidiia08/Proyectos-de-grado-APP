@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -18,6 +19,7 @@ from .serializers import (
 )
 from .services import (
     actualizar_usuario,
+    actualizar_perfil,
     cambiar_password,
     desactivar_usuario,
     obtener_perfil_usuario,
@@ -84,6 +86,15 @@ class PerfilView(APIView):
             perfil_data = None
         return ok("Perfil consultado correctamente.", {"usuario": UsuarioSerializer(perfil["usuario"]).data, "perfil": perfil_data})
 
+    def patch(self, request):
+        try:
+            datos = actualizar_perfil(request.user.id, request.data)
+        except ValidationError as exc:
+            return Response({"error": exc.detail}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as exc:
+            return error(str(exc))
+        return ok("Perfil actualizado exitosamente", datos)
+
 
 class CambioPasswordView(APIView):
     permission_classes = [IsAuthenticated]
@@ -107,7 +118,8 @@ class ListaUsuariosView(APIView):
     permission_classes = [IsAuthenticated, EsComite]
 
     def get(self, request):
-        return ok("Usuarios consultados correctamente.", UsuarioSerializer(Usuario.objects.all(), many=True).data)
+        usuarios = Usuario.objects.select_related("estudiante", "docente").all()
+        return ok("Usuarios consultados correctamente.", UsuarioSerializer(usuarios, many=True).data)
 
 
 class RegistroEstudianteView(APIView):
@@ -116,7 +128,7 @@ class RegistroEstudianteView(APIView):
     def post(self, request):
         serializer = RegistroEstudianteSerializer(data=request.data)
         if not serializer.is_valid():
-            return error("Datos invalidos para registrar estudiante.")
+            return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         estudiante = serializer.save()
         return ok("Estudiante creado correctamente.", EstudianteSerializer(estudiante).data, status.HTTP_201_CREATED)
 
@@ -127,7 +139,7 @@ class RegistroDocenteView(APIView):
     def post(self, request):
         serializer = RegistroDocenteSerializer(data=request.data)
         if not serializer.is_valid():
-            return error("Datos invalidos para registrar docente.")
+            return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         docente = serializer.save()
         return ok("Docente creado correctamente.", DocenteSerializer(docente).data, status.HTTP_201_CREATED)
 

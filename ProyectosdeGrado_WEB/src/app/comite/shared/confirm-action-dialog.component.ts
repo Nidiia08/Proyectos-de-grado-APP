@@ -9,7 +9,9 @@ import { MatInputModule } from '@angular/material/input';
 export interface ComiteConfirmDialogData {
   title: string;
   message: string;
-  confirmText: string;
+  allowHtml?: boolean;
+  confirmText?: string;
+  cancelText?: string;
   requireObservation?: boolean;
 }
 
@@ -25,16 +27,22 @@ export interface ComiteConfirmDialogResult {
   template: `
     <h2 mat-dialog-title>{{ data.title }}</h2>
     <mat-dialog-content class="dialog-body">
-      <p>{{ data.message }}</p>
+      @if (data.allowHtml) {
+        <p [innerHTML]="data.message"></p>
+      } @else {
+        <p>{{ data.message }}</p>
+      }
+      @if (data.requireObservation) {
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Observación</mat-label>
         <textarea matInput rows="4" [(ngModel)]="observation"></textarea>
       </mat-form-field>
+      }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-stroked-button type="button" (click)="close(false)">Cancelar</button>
+      <button mat-stroked-button type="button" (click)="close(false)">{{ data.cancelText ?? 'No' }}</button>
       <button mat-flat-button color="primary" type="button" [disabled]="data.requireObservation && !observation.trim()" (click)="close(true)">
-        {{ data.confirmText }}
+        {{ data.confirmText ?? 'Sí' }}
       </button>
     </mat-dialog-actions>
   `,

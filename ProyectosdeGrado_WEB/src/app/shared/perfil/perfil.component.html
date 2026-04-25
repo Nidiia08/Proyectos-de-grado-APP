@@ -1,0 +1,110 @@
+<section class="perfil-page">
+  <header class="perfil-header">
+    <div>
+      <p class="eyebrow">Mi información</p>
+      <h1>Perfil de usuario</h1>
+      <p>Actualiza tus datos personales sin cambiar tu correo ni tus roles.</p>
+    </div>
+  </header>
+
+  @if (cargando()) {
+    <mat-card class="perfil-card">
+      <mat-card-content class="perfil-loading">
+        <span class="spinner"></span>
+        <p>Cargando perfil...</p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <mat-card class="perfil-card">
+      <mat-card-content>
+        <form [formGroup]="perfilForm" (ngSubmit)="guardarCambios()">
+          <section class="section">
+            <h2>Información personal</h2>
+            <div class="form-grid">
+              <div class="field">
+                <label class="field__label">Tipo de documento <span class="required">*</span></label>
+                <select class="field__select" [class.error]="isInvalid('tipo_documento')" formControlName="tipo_documento">
+                  <option value="CEDULA_CIUDADANIA">Cédula de Ciudadanía</option>
+                  <option value="TARJETA_IDENTIDAD">Tarjeta de Identidad</option>
+                  <option value="CEDULA_EXTRANJERIA">Cédula de Extranjería</option>
+                  <option value="PASAPORTE">Pasaporte</option>
+                </select>
+                <span class="field__hint">Tipo de documento de identidad</span>
+                @if (isInvalid('tipo_documento')) {
+                  <span class="field__error">Selecciona el tipo de documento</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field__label">Número de documento <span class="required">*</span></label>
+                <input class="field__input" [class.error]="isInvalid('numero_documento')" type="text" maxlength="20" formControlName="numero_documento" placeholder="Ej: 1085312456" />
+                <span class="field__hint">Número único del documento</span>
+                @if (isInvalid('numero_documento')) {
+                  <span class="field__error">Ingresa un número de documento válido</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field__label">Nombre <span class="required">*</span></label>
+                <input class="field__input" [class.error]="isInvalid('nombre')" type="text" formControlName="nombre" placeholder="Tu nombre" />
+                <span class="field__hint">Tu nombre</span>
+                @if (isInvalid('nombre')) {
+                  <span class="field__error">El nombre es requerido</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field__label">Apellido <span class="required">*</span></label>
+                <input class="field__input" [class.error]="isInvalid('apellido')" type="text" formControlName="apellido" placeholder="Tu apellido" />
+                <span class="field__hint">Tu apellido</span>
+                @if (isInvalid('apellido')) {
+                  <span class="field__error">El apellido es requerido</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field__label">Celular <span class="required">*</span></label>
+                <input class="field__input" [class.error]="isInvalid('celular')" type="tel" maxlength="10" formControlName="celular" placeholder="3001234567" />
+                <span class="field__hint">Número celular de 10 dígitos</span>
+                @if (isInvalid('celular')) {
+                  <span class="field__error">El celular debe tener exactamente 10 dígitos</span>
+                }
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <h2>Información de contacto</h2>
+            <div class="field">
+              <label class="field__label">Correo institucional</label>
+              <input class="field__input" type="email" formControlName="correo" [disabled]="true" />
+              <span class="field__hint">El correo no puede modificarse</span>
+            </div>
+          </section>
+
+          <section class="section">
+            <h2>Información de rol</h2>
+            <div class="badges">
+              @for (rol of rolesLabel; track rol) {
+                <span class="badge">{{ getRolLabel(rol) }}</span>
+              }
+            </div>
+            <p class="meta">Fecha de registro: {{ fechaRegistroLabel }}</p>
+          </section>
+
+          <div class="actions">
+            <button mat-stroked-button type="button" (click)="perfilForm.reset(perfilForm.getRawValue())">Restablecer</button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="guardando()">
+              @if (guardando()) {
+                <span class="spinner spinner--small"></span>
+                Guardando...
+              } @else {
+                Guardar cambios
+              }
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  }
+</section>

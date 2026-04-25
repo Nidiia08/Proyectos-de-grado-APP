@@ -30,7 +30,6 @@ class Command(BaseCommand):
         "ACUERDO",
         "PROYECTO_ESTUDIANTE",
         "PROYECTO",
-        "GRUPO_INVESTIGACION",
         "PERIODO_ACADEMICO",
         "DOCENTE",
         "ESTUDIANTE",

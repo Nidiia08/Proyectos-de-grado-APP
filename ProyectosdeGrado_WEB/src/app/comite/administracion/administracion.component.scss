@@ -69,13 +69,382 @@
   color: #4b5563;
 }
 
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .actions {
   display: flex;
   align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .full {
   grid-column: 1 / -1;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row mat-form-field {
+  flex: 1;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-inactive {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.badge-inscripcion {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-aprobacion {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-desarrollo {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-culminacion {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.badge-evaluacion {
+  background: #fce7f3;
+  color: #9d174d;
+}
+
+.badge-finalizado {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-cancelado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.warning-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 0.25rem;
+  margin: 0.5rem 0;
+}
+
+.warning-message mat-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.field-description {
+  color: #6b7280;
+  font-size: 0.75rem;
+  padding-left: 0.15rem;
+}
+
+.error-hint {
+  color: #dc2626;
+  font-size: 0.75rem;
+}
+
+.user-form,
+.periodo-form,
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-row {
+  display: flex;
+  gap: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+}
+
+.selection-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.75rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.selection-card {
+  cursor: pointer;
+  padding: 0.75rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.selection-card:hover {
+  border-color: #003087;
+}
+
+.selection-card.selected {
+  border-color: #1d9e75;
+  background: #f0fdf4;
+}
+
+.selection-card mat-card-content p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.selected-info {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: #f3f4f6;
+  border-radius: 0.25rem;
+}
+
+.selected-info p {
+  margin: 0;
+  color: #1f2937;
+}
+
+.selected-info strong {
+  color: #003087;
+}
+
+.estudiante-check {
+  margin: 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.project-card {
+  margin-bottom: 0.75rem;
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.project-badges {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.project-details p {
+  margin: 0.25rem 0;
+  color: #4b5563;
+}
+
+.project-details strong {
+  color: #1f2937;
+}
+
+.roles-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.role-item {
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.role-item strong {
+  color: #003087;
+}
+
+.role-item p {
+  margin: 0.25rem 0 0;
+  color: #4b5563;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ==================== NEW FIELD STYLES ==================== */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.field__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 2px;
+}
+
+.field__label .required {
+  color: #EF4444;
+  margin-left: 2px;
+}
+
+.field__input,
+.field__select {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #111827;
+  background: #FFFFFF;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+.field__input:focus,
+.field__select:focus {
+  border-color: #003087;
+  box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.1);
+}
+
+.field__input.error,
+.field__select.error {
+  border-color: #EF4444;
+}
+
+.field__input::placeholder {
+  color: #9CA3AF;
+  font-size: 13px;
+}
+
+.field__hint {
+  font-size: 12px;
+  color: #6B7280;
+  margin-top: 2px;
+}
+
+.field__error {
+  font-size: 12px;
+  color: #EF4444;
+  margin-top: 2px;
+}
+
+.field__textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #111827;
+  background: #FFFFFF;
+  outline: none;
+  resize: vertical;
+  font-family: 'Roboto', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.field__textarea:focus {
+  border-color: #003087;
+  box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.1);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.form-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 1000px) {
@@ -96,5 +465,27 @@
   .user-row {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .selection-list {
+    grid-template-columns: 1fr;
+  }
+
+  .project-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-grid,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
   }
 }

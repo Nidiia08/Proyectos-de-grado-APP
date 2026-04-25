@@ -1,105 +1,175 @@
 # Proyectos de Grado Monorepo
 
-Monorepo del sistema de seguimiento de trabajos de grado de la Universidad de Narino.
+Sistema de seguimiento de trabajos de grado de la Universidad de Narino.
+
+## Resumen
+
+Este repositorio se usa principalmente con Docker. Esa es la forma recomendada para ejecutar el proyecto, porque el backend, el frontend y la base de datos quedan conectados con las rutas y variables correctas desde `docker-compose.yml`.
+
+El monorepo contiene dos aplicaciones:
+
+- `ProyectosdeGrado_API/`: backend en Django REST Framework.
+- `ProyectosdeGrado_WEB/`: frontend en Angular.
 
 ## Estructura
 
-- `ProyectosdeGrado_API/`: backend Django, Dockerfile y recursos de base de datos.
-- `ProyectosdeGrado_WEB/`: frontend Angular.
-- Raiz: orquestacion compartida con `docker-compose.yml`, `.env`, `.gitignore` y `.dockerignore`.
+- `ProyectosdeGrado_API/`
+  - backend Django, serializers, servicios, comandos y scripts SQL.
+- `ProyectosdeGrado_WEB/`
+  - frontend Angular con Angular Material y Signals.
+- Raiz del monorepo
+  - `docker-compose.yml`
+  - `.env`
+  - `.gitignore`
+  - `.dockerignore`
 
-## Levantar todo el entorno
+## Requisitos
 
-```bash
-docker-compose up --build
-```
+- Docker y Docker Compose.
+- Node.js y npm, solo si vas a trabajar el frontend fuera de Docker.
+- Python 3.11+, solo si vas a trabajar el backend fuera de Docker.
 
-## Paso a paso para generar lo que esta en `.gitignore`
+## Arranque con Docker
 
-Sigue estos pasos para crear localmente los archivos y carpetas que el repo ignora.
+Este es el flujo principal y recomendado.
 
-### 1) Crear entornos virtuales (`.venv/`)
+### 1. Crear archivos de entorno
 
-Desde la raiz del proyecto:
-
-```bash
-python -m venv .venv
-```
-
-Si tambien quieres entorno virtual dentro del backend:
-
-```bash
-python -m venv ProyectosdeGrado_API/.venv
-```
-
-### 2) Crear archivos de variables (`.env`)
-
-Crea estos dos archivos:
+Si no existen, crea estos archivos:
 
 - `.env`
 - `ProyectosdeGrado_API/.env`
 
-Puedes crearlos vacios y luego llenarlos con tus variables:
+En Windows puedes generarlos vacios asi:
 
 ```bash
 type nul > .env
 type nul > ProyectosdeGrado_API/.env
 ```
 
-### 3) Generar dependencias y cache de Angular (`node_modules/`, `.angular/`)
+### 2. Levantar todo el entorno
+
+Desde la raiz del monorepo:
+
+```bash
+docker-compose up --build
+```
+
+Si lo quieres en segundo plano:
+
+```bash
+docker-compose up -d --build
+```
+
+### 3. Verificar que quedo arriba
+
+```bash
+docker-compose ps
+docker-compose logs -f api
+docker-compose logs -f web
+```
+
+## Rehacer archivos ignorados por Git
+
+Si borraste o quieres regenerar lo que esta en `.gitignore`, usa estos comandos.
+
+### Entornos virtuales
+
+```bash
+python -m venv .venv
+python -m venv ProyectosdeGrado_API/.venv
+```
+
+### Variables de entorno
+
+```bash
+type nul > .env
+type nul > ProyectosdeGrado_API/.env
+```
+
+### Dependencias del frontend
 
 ```bash
 cd ProyectosdeGrado_WEB
 npm install
 ```
 
-Con `npm install` se crea `node_modules/`.
-Al ejecutar Angular (por ejemplo `ng serve` o `npm start`) se crea `.angular/`.
-
-### 4) Generar build de Angular (`dist/`)
+### Build del frontend
 
 ```bash
 cd ProyectosdeGrado_WEB
 npm run build
 ```
 
-Esto genera `ProyectosdeGrado_WEB/dist/`.
+### Cache de Angular
 
-### 5) Generar datos locales de Postgres (`postgres_data/`)
+La carpeta `.angular/` se crea automaticamente al ejecutar Angular en desarrollo o al compilar.
 
-Desde la raiz del monorepo:
+### Cache de Django
 
-```bash
-docker-compose up -d
-```
+Los directorios `__pycache__/` y los archivos `*.pyc` se crean automaticamente al ejecutar Python o Django.
 
-Con el volumen configurado en Docker Compose se crea `postgres_data/`.
+### Volumen de PostgreSQL
 
-### 6) Generar cache de Django (`__pycache__/`, `*.pyc`)
-
-Al correr Django o cualquier comando de Python del backend se crean automaticamente.
-Ejemplo:
+El volumen `postgres_data/` se crea al levantar Docker. Si necesitas rehacerlo desde cero, elimina el volumen correspondiente y vuelve a ejecutar:
 
 ```bash
-cd ProyectosdeGrado_API/app
-python manage.py check
+docker-compose up -d --build
 ```
 
-### 7) Carpeta de VS Code (`.vscode/`)
+## Desarrollo fuera de Docker
 
-Se crea cuando guardas configuraciones del espacio de trabajo (tasks, launch, settings) en VS Code.
+Este modo no es el recomendado para el uso normal del proyecto, pero puede servir para pruebas locales.
+
+### Frontend local
+
+```bash
+cd ProyectosdeGrado_WEB
+npm install
+npm start
+```
+
+### Backend local
+
+```bash
+cd ProyectosdeGrado_API
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py runserver 0.0.0.0:8000
+```
+
+## Base de datos
+
+El proyecto usa PostgreSQL.
+
+Cuando trabajes con una base nueva o un volumen limpio, asegurate de que el esquema se cargue correctamente antes de probar los endpoints.
 
 ## Comandos utiles
 
 ```bash
-docker-compose exec api python manage.py crear_comite
-docker-compose exec api python manage.py migrate token_blacklist
 docker-compose exec api python manage.py migrate
 docker-compose logs -f api
+docker-compose logs -f db
 docker-compose down
 ```
 
-## Variables de entorno
+## Ultimo paso obligatorio
 
-- `.env` en la raiz: variables compartidas entre servicios.
-- `ProyectosdeGrado_API/.env`: variables exclusivas del backend Django.
+Ejecuta estos comandos solo al final, cuando todo este armado y los contenedores ya esten arriba para crear el comité que será usuario administrador y migrar el token blacklist:
+
+```bash
+docker-compose exec api python manage.py crear_comite
+docker-compose exec api python manage.py migrate token_blacklist
+```
+
+Orden recomendado al final:
+
+1. Confirmar que `docker-compose ps` muestre los servicios arriba.
+2. Ejecutar `docker-compose exec api python manage.py crear_comite`.
+3. Ejecutar `docker-compose exec api python manage.py migrate token_blacklist`.
+
+## Notas
+
+- Si cambias el esquema de la base de datos, revisa tambien los scripts SQL y las migraciones del backend.
+- Para evitar problemas de rutas, usa Docker como forma principal de ejecucion.

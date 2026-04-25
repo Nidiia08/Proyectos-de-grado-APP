@@ -1,5 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../core/auth.service';
+import { environment } from '../../environments/environment';
 
 export enum ComiteFaseProyecto {
   Inscripcion = 'inscripcion',
@@ -89,6 +91,16 @@ export interface NotaJurado {
   jurado: string;
   nota: number;
   fecha: string;
+}
+
+interface UsuarioComiteApi {
+  id: number;
+  nombre: string;
+  apellido: string;
+  correo: string;
+  roles: string[];
+  activo: boolean;
+  fecha_registro: string;
 }
 
 export interface ProyectoComite {
@@ -493,7 +505,9 @@ function createPeriods(): PeriodoAcademico[] {
   providedIn: 'root',
 })
 export class ComiteService {
+  private readonly http = inject(HttpClient);
   private readonly auth = inject(AuthService);
+  private readonly apiUrl = environment.apiUrl;
   private readonly perfilSignal = signal<ComitePerfil>({
     id: 1,
     nombre: 'Mg. Sandra Muñoz',
@@ -535,7 +549,14 @@ export class ComiteService {
   readonly perfil = computed(() => {
     const role = this.auth.userRole();
     const base = this.perfilSignal();
-    return role === 'committee' ? base : { ...base, nombre: 'Miembro de comité de prueba' };
+    if (role === 'committee') {
+      const usuario = this.auth.usuario;
+      if (usuario) {
+        return { ...base, nombre: `${usuario.nombre} ${usuario.apellido}`.trim() };
+      }
+      return base;
+    }
+    return { ...base, nombre: 'Miembro de comité de prueba' };
   });
   readonly proyectos = computed(() => this.projects());
   readonly proyectosRecientes = computed(() => [...this.projects()].sort((a, b) => +new Date(b.ultimaActividad) - +new Date(a.ultimaActividad)).slice(0, 10));
@@ -778,12 +799,57 @@ export class ComiteService {
     this.templates.update((items) => [{ id: Date.now(), ...item, ultimaActualizacion: nowIso().slice(0, 10) }, ...items]);
   }
 
-  createUser(input: { nombre: string; correo: string; rol: string }): void {
-    this.users.update((items) => [{ id: Date.now(), nombre: input.nombre, correo: input.correo, rol: input.rol, estado: 'Activo', fechaRegistro: nowIso().slice(0, 10) }, ...items]);
+  createUser(input: { nombre: string; correo: string; rol: string; contrasena: string }): void {
+    const [nombre, apellido] = input.nombre.split(' ', 2);
+    const payload = {
+      nombre: nombre || input.nombre,
+      apellido: apellido || '',
+      correo: input.correo,
+      password: input.contrasena,
+      roles: input.rol === 'Estudiante' ? [] : [input.rol === 'Comité Curricular' ? 'COMITE' : input.rol === 'Asesor/Director' ? 'DOCENTE' : 'JURADO'],
+      codigo_docente: input.rol === 'Estudiante' ? '' : `DOC-${Date.now()}`,
+      codigo_estudiante: input.rol === 'Estudiante' ? `EST-${Date.now()}` : '',
+      programa: input.rol === 'Estudiante' ? 'Ingeniería de Sistemas' : '',
+    };
+    const endpoint = input.rol === 'Estudiante' ? 'estudiantes/' : 'docentes/';
+    this.http.post<{ datos: unknown }>(`${this.apiUrl}/usuarios/${endpoint}`, payload).subscribe({
+      next: () => {
+        this.loadUsers();
+      },
+      error: (err) => console.error('Error creando usuario:', err),
+    });
+  }
+
+  loadUsers(): void {
+    this.http.get<{ datos: UsuarioComiteApi[] }>(`${this.apiUrl}/usuarios/`).subscribe({
+      next: (response) => {
+        const usuariosAPI = (response.datos || []).map((u) => ({
+          id: u.id,
+          nombre: `${u.nombre} ${u.apellido}`.trim(),
+          correo: u.correo,
+          rol: u.roles.includes('COMITE')
+            ? 'Comité Curricular'
+            : u.roles.includes('DOCENTE')
+            ? 'Asesor/Director'
+            : u.roles.includes('JURADO')
+            ? 'Jurado Evaluador'
+            : 'Estudiante',
+          estado: u.activo ? 'Activo' : 'Inactivo',
+          fechaRegistro: u.fecha_registro,
+        }));
+        this.users.set(usuariosAPI as UsuarioSistema[]);
+      },
+      error: (err) => console.error('Error cargando usuarios:', err),
+    });
   }
 
   toggleUserStatus(userId: number): void {
-    this.users.update((items) => items.map((item) => (item.id === userId ? { ...item, estado: item.estado === 'Activo' ? 'Inactivo' : 'Activo' } : item)));
+    this.http.patch<{ datos: unknown }>(`${this.apiUrl}/usuarios/${userId}/desactivar/`, {}).subscribe({
+      next: () => {
+        this.loadUsers();
+      },
+      error: (err) => console.error('Error toggling user status:', err),
+    });
   }
 
   updateRolePermissions(role: string, permissions: string[]): void {

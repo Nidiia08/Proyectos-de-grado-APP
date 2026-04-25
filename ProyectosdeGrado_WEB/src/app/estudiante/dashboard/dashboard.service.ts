@@ -1,5 +1,7 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable, catchError, map, of } from 'rxjs';
+import { AuthService } from '../../core/auth.service';
+import { ApiService } from '../../core/api.service';
 import {
   ProjectModality,
   SocialSubtype,
@@ -13,24 +15,97 @@ export const PROJECT_PHASES_ORDER = STUDENT_WORKFLOW_PHASES;
 
 export interface StudentDashboardSummary {
   studentName: string;
+  projectName: string;
   modality: ProjectModality;
   socialSubtype: SocialSubtype | null;
   statusLabel: string;
   currentPhase: ProjectPhase;
 }
 
-const MOCK_SUMMARY: StudentDashboardSummary = {
-  studentName: 'Laura Marcela Vélez Ortiz',
-  modality: 'interaccion_social',
-  socialSubtype: 'proyecto_desarrollo_software',
-  statusLabel: 'En desarrollo',
-  currentPhase: 'desarrollo',
-};
+interface ApiResponse<T> {
+  mensaje: string;
+  datos: T;
+}
+
+interface ProyectoDashboardApi {
+  nombre: string;
+  modalidad: 'INVESTIGACION' | 'INTERACCION_SOCIAL';
+  subtipo?: 'PASANTIA' | 'DESARROLLO_SOFTWARE' | 'INTERVENCION' | null;
+  fase_actual: 'INSCRIPCION' | 'APROBACION' | 'DESARROLLO' | 'CULMINACION' | 'EVALUACION';
+  estado: 'ACTIVO' | 'FINALIZADO' | 'CANCELADO' | 'REPROBADO';
+}
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
+  private readonly api = inject(ApiService);
+  private readonly auth = inject(AuthService);
+
   getStudentDashboard(): Observable<StudentDashboardSummary> {
-    return of(MOCK_SUMMARY).pipe(delay(150));
+    return this.api.get<ApiResponse<ProyectoDashboardApi[]>>('proyectos/').pipe(
+      map((response) => this.mapToSummary(response.datos?.[0])),
+      catchError(() => of(this.mapToSummary(undefined))),
+    );
+  }
+
+  private mapToSummary(project?: ProyectoDashboardApi): StudentDashboardSummary {
+    const usuario = this.auth.usuario;
+    const studentName = usuario
+      ? `${usuario.nombre} ${usuario.apellido}`.trim()
+      : 'Estudiante';
+
+    if (!project) {
+      return {
+        studentName,
+        projectName: 'Sin proyecto de grado registrado',
+        modality: 'interaccion_social',
+        socialSubtype: null,
+        statusLabel: 'Sin proyecto asignado',
+        currentPhase: 'inscripcion',
+      };
+    }
+
+    return {
+      studentName,
+      projectName: project.nombre,
+      modality: project.modalidad === 'INVESTIGACION' ? 'investigacion' : 'interaccion_social',
+      socialSubtype: this.mapSubtipo(project.subtipo),
+      statusLabel: this.mapEstado(project.estado),
+      currentPhase: this.mapFase(project.fase_actual),
+    };
+  }
+
+  private mapSubtipo(subtipo?: ProyectoDashboardApi['subtipo']): SocialSubtype | null {
+    if (!subtipo) {
+      return null;
+    }
+
+    const map: Record<NonNullable<ProyectoDashboardApi['subtipo']>, SocialSubtype> = {
+      PASANTIA: 'pasantia',
+      DESARROLLO_SOFTWARE: 'proyecto_desarrollo_software',
+      INTERVENCION: 'proyecto_intervencion',
+    };
+    return map[subtipo];
+  }
+
+  private mapFase(fase: ProyectoDashboardApi['fase_actual']): ProjectPhase {
+    const map: Record<ProyectoDashboardApi['fase_actual'], ProjectPhase> = {
+      INSCRIPCION: 'inscripcion',
+      APROBACION: 'aprobacion',
+      DESARROLLO: 'desarrollo',
+      CULMINACION: 'culminacion',
+      EVALUACION: 'evaluacion',
+    };
+    return map[fase];
+  }
+
+  private mapEstado(estado: ProyectoDashboardApi['estado']): string {
+    const map: Record<ProyectoDashboardApi['estado'], string> = {
+      ACTIVO: 'Activo',
+      FINALIZADO: 'Finalizado',
+      CANCELADO: 'Cancelado',
+      REPROBADO: 'Reprobado',
+    };
+    return map[estado];
   }
 
   modalityLabel(m: ProjectModality): string {

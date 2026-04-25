@@ -45,6 +45,7 @@ export class NavigationService {
     const vistaPorSegmento: Record<string, string> = {
       login: 'login',
       dashboard: 'dashboard',
+        perfil: 'perfil',
       plantillas: 'templates',
       notificaciones: 'notifications',
       entregables: 'deliverables',
@@ -54,6 +55,7 @@ export class NavigationService {
       revisiones: 'reviews',
       reportes: 'reports',
       administracion: 'administration',
+      'cambiar-password': 'change-password',
       'no-autorizado': 'no-autorizado',
     };
 
@@ -61,9 +63,14 @@ export class NavigationService {
   }
 
   private resolverRutaPorVista(role: UserRole | '', view: string): string {
+    if (view === 'change-password') {
+      return '/cambiar-password';
+    }
+
     const rutasPorRol: Record<UserRole, Record<string, string>> = {
       student: {
         dashboard: '/estudiante/dashboard',
+        perfil: '/estudiante/perfil',
         templates: '/estudiante/plantillas',
         notifications: '/estudiante/notificaciones',
         deliverables: '/estudiante/entregables',
@@ -71,6 +78,7 @@ export class NavigationService {
       },
       professor: {
         dashboard: '/asesor/dashboard',
+        perfil: '/asesor/perfil',
         templates: '/asesor/plantillas',
         notifications: '/asesor/notificaciones',
         assigned: '/asesor/assigned',
@@ -79,6 +87,7 @@ export class NavigationService {
       },
       jury: {
         dashboard: '/jurado/dashboard',
+        perfil: '/jurado/perfil',
         projects: '/jurado/proyectos',
         templates: '/jurado/plantillas',
         notifications: '/jurado/notificaciones',
@@ -87,6 +96,7 @@ export class NavigationService {
       },
       committee: {
         dashboard: '/comite/dashboard',
+        perfil: '/comite/perfil',
         projects: '/comite/proyectos',
         templates: '/comite/plantillas',
         notifications: '/comite/notificaciones',

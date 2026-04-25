@@ -452,6 +452,10 @@ export class AsesorService {
     const role = this.auth.userRole();
     const base = this.docente();
     if (role === 'professor') {
+      const usuario = this.auth.usuario;
+      if (usuario) {
+        return { ...base, nombre: `${usuario.nombre} ${usuario.apellido}`.trim() };
+      }
       return base;
     }
     return { ...base, nombre: 'Docente de prueba' };

@@ -11,7 +11,11 @@ export interface Usuario {
   nombre: string;
   apellido: string;
   correo: string;
+  tipo_documento: string;
+  numero_documento: string;
+  celular: string;
   roles: RolUsuario[];
+  fecha_registro?: string;
 }
 
 export interface LoginResponse {
@@ -20,6 +24,7 @@ export interface LoginResponse {
     access: string;
     refresh: string;
     rol_sesion: RolUsuario;
+    debe_cambiar_password?: boolean;
     usuario: Usuario;
   };
 }
@@ -29,4 +34,11 @@ export interface SesionActual {
   rolSesion: RolUsuario;
   accessToken: string;
   refreshToken: string;
+  debeCambiarPassword: boolean;
+}
+
+export interface CambioPasswordRequest {
+  password_actual: string;
+  password_nuevo: string;
+  confirmar_password: string;
 }

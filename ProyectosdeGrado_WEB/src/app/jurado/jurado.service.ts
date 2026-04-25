@@ -462,7 +462,14 @@ export class JuradoService {
   readonly perfil = computed(() => {
     const role = this.auth.userRole();
     const base = this.jurado();
-    return role === 'jury' ? base : { ...base, nombre: 'Jurado de prueba' };
+    if (role === 'jury') {
+      const usuario = this.auth.usuario;
+      if (usuario) {
+        return { ...base, nombre: `${usuario.nombre} ${usuario.apellido}`.trim() };
+      }
+      return base;
+    }
+    return { ...base, nombre: 'Jurado de prueba' };
   });
 
   readonly proyectos = computed(() => this.projects());

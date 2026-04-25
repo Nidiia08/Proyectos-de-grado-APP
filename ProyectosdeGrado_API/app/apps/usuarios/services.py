@@ -1,9 +1,17 @@
 from typing import Any
 
 from django.db import transaction
+from django.utils import timezone
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Docente, Estudiante, Usuario, UsuarioRol
+
+ROLES_CON_CAMBIO_PASSWORD_OBLIGATORIO = {
+    UsuarioRol.Rol.ESTUDIANTE,
+    UsuarioRol.Rol.DOCENTE,
+    UsuarioRol.Rol.JURADO,
+}
 
 
 def autenticar_usuario(correo: str, password: str, rol: str) -> dict[str, Any]:
@@ -17,15 +25,21 @@ def autenticar_usuario(correo: str, password: str, rol: str) -> dict[str, Any]:
         raise ValueError(f"No tienes acceso como {rol}")
 
     refresh = RefreshToken.for_user(usuario)
+    refresh["rol_sesion"] = rol
+    debe_cambiar_password = rol in ROLES_CON_CAMBIO_PASSWORD_OBLIGATORIO and usuario.last_login is None
     return {
         "access": str(refresh.access_token),
         "refresh": str(refresh),
         "rol_sesion": rol,
+        "debe_cambiar_password": debe_cambiar_password,
         "usuario": {
             "id": usuario.id,
             "nombre": usuario.nombre,
             "apellido": usuario.apellido,
             "correo": usuario.correo,
+            "tipo_documento": usuario.tipo_documento,
+            "numero_documento": usuario.numero_documento,
+            "celular": usuario.celular,
             "roles": usuario.roles_lista,
         },
     }
@@ -39,6 +53,9 @@ def registrar_estudiante(datos: dict[str, Any]) -> Estudiante:
         password=datos["password"],
         nombre=datos["nombre"],
         apellido=datos["apellido"],
+        tipo_documento=datos["tipo_documento"],
+        numero_documento=datos["numero_documento"],
+        celular=datos["celular"],
         roles=[UsuarioRol.Rol.ESTUDIANTE],
         activo=True,
     )
@@ -59,6 +76,9 @@ def registrar_docente(datos: dict[str, Any]) -> Docente:
         password=datos["password"],
         nombre=datos["nombre"],
         apellido=datos["apellido"],
+        tipo_documento=datos["tipo_documento"],
+        numero_documento=datos["numero_documento"],
+        celular=datos["celular"],
         roles=datos.get("roles") or [UsuarioRol.Rol.DOCENTE],
         activo=True,
     )
@@ -98,6 +118,20 @@ def actualizar_usuario(usuario_id: int, datos: dict[str, Any]) -> Usuario:
 
 
 @transaction.atomic
+def actualizar_perfil(usuario_id: int, datos: dict[str, Any]) -> dict[str, Any]:
+    """Actualiza los datos personales permitidos del usuario autenticado."""
+    usuario = Usuario.objects.get(id=usuario_id)
+
+    from .serializers import ActualizarPerfilSerializer, UsuarioSerializer
+
+    serializer = ActualizarPerfilSerializer(usuario, data=datos, partial=True)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    usuario.refresh_from_db()
+    return UsuarioSerializer(usuario).data
+
+
+@transaction.atomic
 def desactivar_usuario(usuario_id: int) -> Usuario:
     """Desactiva un usuario del sistema."""
     usuario = Usuario.objects.get(id=usuario_id)
@@ -113,4 +147,10 @@ def cambiar_password(usuario_id: int, password_actual: str, password_nuevo: str)
     if not usuario.check_password(password_actual):
         raise ValueError("La contrasena actual no es correcta.")
     usuario.set_password(password_nuevo)
+    if usuario.last_login is None and usuario.roles.filter(rol__in=ROLES_CON_CAMBIO_PASSWORD_OBLIGATORIO).exists():
+        usuario.last_login = timezone.now()
     usuario.save()
+
+    tokens = OutstandingToken.objects.filter(user=usuario)
+    for token in tokens:
+        BlacklistedToken.objects.get_or_create(token=token)

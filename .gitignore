@@ -2,10 +2,6 @@
 .venv/
 ProyectosdeGrado_API/.venv/
 
-# Variables de entorno
-.env
-ProyectosdeGrado_API/.env
-
 # Django
 ProyectosdeGrado_API/**/__pycache__/
 ProyectosdeGrado_API/**/*.pyc

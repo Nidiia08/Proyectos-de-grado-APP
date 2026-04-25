@@ -5,9 +5,8 @@ from rest_framework.views import APIView
 
 from apps.usuarios.permissions import tiene_rol
 
-from .models import GrupoInvestigacion, PeriodoAcademico, Proyecto
+from .models import PeriodoAcademico, Proyecto
 from .serializers import (
-    GrupoInvestigacionSerializer,
     PeriodoAcademicoSerializer,
     ProyectoCreateSerializer,
     ProyectoSerializer,
@@ -35,7 +34,7 @@ class ProyectoListCreateView(APIView):
             return error("Solo el comite puede crear proyectos.", status.HTTP_403_FORBIDDEN)
         serializer = ProyectoCreateSerializer(data=request.data)
         if not serializer.is_valid():
-            return error("Datos invalidos para crear proyecto.")
+            return error(f"Datos invalidos para crear proyecto. {serializer.errors}")
         proyecto = crear_proyecto(serializer.validated_data, request.user)
         return ok("Proyecto creado correctamente.", ProyectoSerializer(proyecto).data, status.HTTP_201_CREATED)
 
@@ -72,19 +71,3 @@ class PeriodoListCreateView(APIView):
             return error("Datos invalidos para crear periodo.")
         serializer.save()
         return ok("Periodo creado correctamente.", serializer.data, status.HTTP_201_CREATED)
-
-
-class GrupoInvestigacionListCreateView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        return ok("Grupos consultados correctamente.", GrupoInvestigacionSerializer(GrupoInvestigacion.objects.all(), many=True).data)
-
-    def post(self, request):
-        if not tiene_rol(request.user, "COMITE"):
-            return error("Solo el comite puede crear grupos.", status.HTTP_403_FORBIDDEN)
-        serializer = GrupoInvestigacionSerializer(data=request.data)
-        if not serializer.is_valid():
-            return error("Datos invalidos para crear grupo.")
-        serializer.save()
-        return ok("Grupo creado correctamente.", serializer.data, status.HTTP_201_CREATED)

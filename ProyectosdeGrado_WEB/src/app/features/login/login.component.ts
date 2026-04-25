@@ -82,6 +82,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       .pipe(finalize(() => (this.cargando = false)))
       .subscribe({
         next: (response) => {
+          if (response.datos.debe_cambiar_password) {
+            this.nav.navigate('change-password');
+            return;
+          }
           this.nav.navigateToRoleDashboard(response.datos.rol_sesion);
         },
         error: (error) => {
