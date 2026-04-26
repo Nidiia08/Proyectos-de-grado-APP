@@ -136,9 +136,15 @@ cd ProyectosdeGrado_API
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
-python manage.py runserver 0.0.0.0:8000
 ```
+## Ultimo paso obligatorio
 
+Ejecuta estos comandos solo al final, cuando todo este armado y los contenedores ya esten arriba para crear el comité que será usuario administrador y migrar el token blacklist:
+
+```bash
+docker-compose exec api python manage.py crear_comite
+docker-compose exec api python manage.py migrate token_blacklist
+```
 ## Base de datos
 
 El proyecto usa PostgreSQL.
@@ -153,21 +159,6 @@ docker-compose logs -f api
 docker-compose logs -f db
 docker-compose down
 ```
-
-## Ultimo paso obligatorio
-
-Ejecuta estos comandos solo al final, cuando todo este armado y los contenedores ya esten arriba para crear el comité que será usuario administrador y migrar el token blacklist:
-
-```bash
-docker-compose exec api python manage.py crear_comite
-docker-compose exec api python manage.py migrate token_blacklist
-```
-
-Orden recomendado al final:
-
-1. Confirmar que `docker-compose ps` muestre los servicios arriba.
-2. Ejecutar `docker-compose exec api python manage.py crear_comite`.
-3. Ejecutar `docker-compose exec api python manage.py migrate token_blacklist`.
 
 ## Notas
 

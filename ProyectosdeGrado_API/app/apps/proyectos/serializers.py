@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.usuarios.models import Docente, Estudiante
+from apps.usuarios.models import Docente, Estudiante, Usuario
 from apps.usuarios.serializers import DocenteSerializer, EstudianteSerializer
 
 from .models import PeriodoAcademico, Proyecto, ProyectoEstudiante
@@ -66,8 +66,28 @@ class ProyectoCreateSerializer(serializers.ModelSerializer):
             "estudiantes",
         )
 
+    @staticmethod
+    def _resolver_docente(identificador):
+        usuario = Usuario.objects.filter(id=identificador).first()
+        if usuario:
+            return Docente.objects.filter(usuario_id=identificador).first()
+
+        docente_por_usuario = Docente.objects.filter(usuario_id=identificador).first()
+        docente_por_id = Docente.objects.filter(id=identificador).first()
+        return docente_por_usuario or docente_por_id
+
+    @staticmethod
+    def _resolver_estudiante(identificador):
+        usuario = Usuario.objects.filter(id=identificador).first()
+        if usuario:
+            return Estudiante.objects.filter(usuario_id=identificador).first()
+
+        estudiante_por_usuario = Estudiante.objects.filter(usuario_id=identificador).first()
+        estudiante_por_id = Estudiante.objects.filter(id=identificador).first()
+        return estudiante_por_usuario or estudiante_por_id
+
     def validate_asesor_id(self, value):
-        docente = Docente.objects.filter(id=value).first() or Docente.objects.filter(usuario_id=value).first()
+        docente = self._resolver_docente(value)
         if not docente:
             raise serializers.ValidationError("El asesor seleccionado no existe.")
         return docente
@@ -75,7 +95,7 @@ class ProyectoCreateSerializer(serializers.ModelSerializer):
     def validate_coasesor_id(self, value):
         if value in (None, ""):
             return None
-        docente = Docente.objects.filter(id=value).first() or Docente.objects.filter(usuario_id=value).first()
+        docente = self._resolver_docente(value)
         if not docente:
             raise serializers.ValidationError("El coasesor seleccionado no existe.")
         return docente
@@ -96,6 +116,7 @@ class ProyectoCreateSerializer(serializers.ModelSerializer):
 
         estudiantes_entrada = attrs.get("estudiantes") or []
         estudiantes_normalizados = []
+        estudiantes_ids_payload = set()
         for item in estudiantes_entrada:
             estudiante_id = item.get("estudiante_id")
             es_autor_principal = bool(item.get("es_autor_principal", False))
@@ -103,13 +124,17 @@ class ProyectoCreateSerializer(serializers.ModelSerializer):
             if estudiante_id is None:
                 raise serializers.ValidationError("Cada estudiante debe incluir estudiante_id.")
 
-            estudiante = Estudiante.objects.filter(id=estudiante_id).first() or Estudiante.objects.filter(
-                usuario_id=estudiante_id
-            ).first()
+            estudiante = self._resolver_estudiante(estudiante_id)
             if not estudiante:
                 raise serializers.ValidationError(
                     f"El estudiante con id {estudiante_id} no existe."
                 )
+
+            if estudiante.id in estudiantes_ids_payload:
+                raise serializers.ValidationError(
+                    f"El estudiante con id {estudiante.id} esta repetido en la lista."
+                )
+            estudiantes_ids_payload.add(estudiante.id)
 
             estudiantes_normalizados.append(
                 {
@@ -117,6 +142,17 @@ class ProyectoCreateSerializer(serializers.ModelSerializer):
                     "es_autor_principal": es_autor_principal,
                 }
             )
+
+        if estudiantes_ids_payload:
+            asignaciones = ProyectoEstudiante.objects.filter(estudiante_id__in=estudiantes_ids_payload)
+            if self.instance:
+                asignaciones = asignaciones.exclude(proyecto_id=self.instance.id)
+            estudiantes_asignados = list(asignaciones.values_list("estudiante_id", flat=True).distinct())
+            if estudiantes_asignados:
+                estudiantes_asignados_str = ", ".join(str(est_id) for est_id in estudiantes_asignados)
+                raise serializers.ValidationError(
+                    f"Los siguientes estudiantes ya tienen un proyecto asignado: {estudiantes_asignados_str}."
+                )
 
         if not attrs.get("es_grupo") and len(estudiantes_normalizados) > 1:
             raise serializers.ValidationError("Un proyecto individual solo puede tener un estudiante.")

@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -35,7 +36,13 @@ class ProyectoListCreateView(APIView):
         serializer = ProyectoCreateSerializer(data=request.data)
         if not serializer.is_valid():
             return error(f"Datos invalidos para crear proyecto. {serializer.errors}")
-        proyecto = crear_proyecto(serializer.validated_data, request.user)
+        try:
+            proyecto = crear_proyecto(serializer.validated_data, request.user)
+        except IntegrityError:
+            return error(
+                "No se pudo crear el proyecto por una restriccion de integridad. "
+                "Verifica que los estudiantes no esten asignados a otro proyecto."
+            )
         return ok("Proyecto creado correctamente.", ProyectoSerializer(proyecto).data, status.HTTP_201_CREATED)
 
 

@@ -277,9 +277,15 @@ export class AdministracionComponent implements OnInit {
     const asesorDetalle = (proyecto as unknown as {
       asesor_detalle?: { usuario?: { nombre?: string; apellido?: string } };
     }).asesor_detalle;
+    const coasesorDetalle = (proyecto as unknown as {
+      coasesor_detalle?: { usuario?: { nombre?: string; apellido?: string } };
+    }).coasesor_detalle;
 
     const asesorNombreDesdeDetalle = asesorDetalle?.usuario
       ? `${asesorDetalle.usuario.nombre || ''} ${asesorDetalle.usuario.apellido || ''}`.trim()
+      : undefined;
+    const coasesorNombreDesdeDetalle = coasesorDetalle?.usuario
+      ? `${coasesorDetalle.usuario.nombre || ''} ${coasesorDetalle.usuario.apellido || ''}`.trim()
       : undefined;
 
     const estudiantesRaw = Array.isArray(proyecto.estudiantes) ? proyecto.estudiantes : [];
@@ -307,7 +313,7 @@ export class AdministracionComponent implements OnInit {
       periodo_academico_id: Number.isFinite(periodoAcademicoId) ? periodoAcademicoId : 0,
       asesor_id: Number.isFinite(asesorId) ? asesorId : 0,
       asesor_nombre: proyecto.asesor_nombre || asesorNombreDesdeDetalle,
-      coasesor_nombre: proyecto.coasesor_nombre,
+      coasesor_nombre: proyecto.coasesor_nombre || coasesorNombreDesdeDetalle,
       estudiantes: estudiantesNormalizados,
     };
   }
@@ -639,7 +645,17 @@ export class AdministracionComponent implements OnInit {
           },
           error: (err: Error) => {
             this.enviandoProyecto.set(false);
-            this.snackBar.open(err.message, 'Cerrar', { duration: 5000 });
+            let mensaje = err.message;
+            if (err.message.includes('ya tienen un proyecto asignado')) {
+              const match = err.message.match(/estudiantes ya tienen un proyecto asignado: ([^.]+)/);
+              if (match) {
+                const codigosEstudiantes = match[1];
+                mensaje = `Uno o más estudiantes ya tienen un proyecto asignado (códigos: ${codigosEstudiantes}). Por favor seleccione otros estudiantes.`;
+              } else {
+                mensaje = 'Uno o más estudiantes selecionados ya tienen un proyecto asignado. No pueden participar en dos proyectos.';
+              }
+            }
+            this.snackBar.open(mensaje, 'Cerrar', { duration: 5000 });
           },
         });
       } else {
@@ -713,18 +729,20 @@ export class AdministracionComponent implements OnInit {
       return proyecto.asesor_nombre;
     }
 
-    const asesorUsuario = this.usuarios().find((u) => u.id === proyecto.asesor_id);
+    const asesorUsuario = this.usuarios().find((u) => u.id === proyecto.asesor_id && u.roles.includes('DOCENTE'));
     return asesorUsuario ? `${asesorUsuario.nombre} ${asesorUsuario.apellido}` : '';
   }
 
   getNombreCoasesor(proyecto: ProyectoApi): string {
-    const coasesorId = Number((proyecto as unknown as { coasesor?: number; coasesor_id?: number }).coasesor_id ?? (proyecto as unknown as { coasesor?: number }).coasesor ?? 0);
-    const coasesorNombre = proyecto.coasesor_nombre;
-    if (coasesorNombre) {
-      return coasesorNombre;
+    const proyectoExtendido = proyecto as unknown as { coasesor?: number; coasesor_id?: number };
+    const coasesorId = Number(proyectoExtendido.coasesor_id ?? proyectoExtendido.coasesor ?? 0);
+    if (!coasesorId) return '';
+
+    if (proyecto.coasesor_nombre) {
+      return proyecto.coasesor_nombre;
     }
 
-    const coasesorUsuario = this.usuarios().find((u) => u.id === coasesorId);
+    const coasesorUsuario = this.usuarios().find((u) => u.id === coasesorId && u.roles.includes('DOCENTE'));
     return coasesorUsuario ? `${coasesorUsuario.nombre} ${coasesorUsuario.apellido}` : '';
   }
 

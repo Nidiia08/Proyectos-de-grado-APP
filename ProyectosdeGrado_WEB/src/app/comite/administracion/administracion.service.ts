@@ -19,17 +19,20 @@ export class AdministracionService {
 
   private handleError = (error: unknown) => {
     if (error && typeof error === 'object' && 'status' in error) {
-      const httpError = error as { status: number; error?: { error?: string } };
+      const httpError = error as { status: number; error?: { error?: string; non_field_errors?: string[] } };
       if (httpError.status === 0) {
         return throwError(() => new Error('No se pudo conectar con el servidor. Verifique su conexión.'));
       }
       if (httpError.status === 400) {
-        const detail = httpError.error?.error;
-        if (typeof detail === 'string') {
-          return throwError(() => new Error(detail));
+        let mensaje = httpError.error?.error;
+        if (!mensaje && httpError.error?.non_field_errors) {
+          mensaje = httpError.error.non_field_errors.join(' ');
         }
-        if (detail && typeof detail === 'object') {
-          const message = Object.entries(detail)
+        if (typeof mensaje === 'string' && mensaje) {
+          return throwError(() => new Error(mensaje));
+        }
+        if (mensaje && typeof mensaje === 'object') {
+          const message = Object.entries(mensaje)
             .flatMap(([, value]) => (Array.isArray(value) ? value : [value]))
             .map((value) => String(value))
             .join(' ');
