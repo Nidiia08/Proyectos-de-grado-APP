@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "apps.notificaciones",
     "apps.chat",
     "apps.configuracion",
+    "apps.plantillas",
 ]
 
 MIDDLEWARE = [
@@ -95,7 +96,10 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 AUTH_USER_MODEL = "usuarios.Usuario"
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:4200"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",
+    "http://127.0.0.1:4200",
+]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (

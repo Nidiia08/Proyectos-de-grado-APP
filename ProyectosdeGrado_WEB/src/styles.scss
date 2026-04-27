@@ -295,7 +295,6 @@ button[mat-flat-button] {
 .mat-mdc-text-field-wrapper {
   border-radius: 16px !important;
   background: rgba(255, 255, 255, 0.95) !important;
-  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.45);
 }
 
 .mat-mdc-form-field {
@@ -303,25 +302,30 @@ button[mat-flat-button] {
 }
 
 .mat-mdc-form-field-subscript-wrapper {
-  display: none;
-}
-
-.mat-mdc-form-field-infix {
-  min-height: 3.6rem !important;
-  padding-top: 1rem !important;
-  padding-bottom: 0.85rem !important;
+  min-height: 0;
 }
 
 .mat-mdc-form-field .mdc-notched-outline {
-  display: block !important;
+  display: flex !important;
 }
 
-.mat-mdc-form-field:hover .mat-mdc-text-field-wrapper {
-  box-shadow: inset 0 0 0 1px rgba(13, 92, 115, 0.5);
+.mat-mdc-form-field .mdc-notched-outline__leading,
+.mat-mdc-form-field .mdc-notched-outline__notch,
+.mat-mdc-form-field .mdc-notched-outline__trailing {
+  border-color: rgba(148, 163, 184, 0.55) !important;
 }
 
-.mat-mdc-form-field.mat-focused .mat-mdc-text-field-wrapper {
-  box-shadow: inset 0 0 0 1.5px var(--mat-sys-primary);
+.mat-mdc-form-field:hover .mdc-notched-outline__leading,
+.mat-mdc-form-field:hover .mdc-notched-outline__notch,
+.mat-mdc-form-field:hover .mdc-notched-outline__trailing {
+  border-color: rgba(13, 92, 115, 0.7) !important;
+}
+
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--mat-sys-primary) !important;
+  border-width: 2px !important;
 }
 
 .mat-mdc-form-field .mat-mdc-floating-label,

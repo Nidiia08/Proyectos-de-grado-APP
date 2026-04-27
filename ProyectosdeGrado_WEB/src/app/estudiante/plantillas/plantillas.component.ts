@@ -1,70 +1,102 @@
-import { CommonModule, NgClass } from '@angular/common';
-import { Component, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-
-interface PlantillaEstudiante {
-  titulo: string;
-  descripcion: string;
-  formato: string;
-}
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { PlantillasService, Plantilla } from '../../shared/plantillas/plantillas.service';
+import { AuthService } from '../../core/auth.service';
 
 @Component({
   selector: 'app-estudiante-plantillas',
   standalone: true,
-  imports: [CommonModule, NgClass, FormsModule, MatCardModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatCardModule, MatIconModule, MatSnackBarModule],
   templateUrl: './plantillas.component.html',
   styleUrl: './plantillas.component.scss',
 })
-export class PlantillasComponent {
+export class PlantillasComponent implements OnInit {
+  private readonly plantillasService = inject(PlantillasService);
+  private readonly authService = inject(AuthService);
+  private readonly snackBar = inject(MatSnackBar);
+
   readonly search = signal('');
-
-  readonly plantillas: PlantillaEstudiante[] = [
-    {
-      titulo: 'Propuesta de trabajo de grado',
-      descripcion: 'Estructura oficial para presentación ante el comité.',
-      formato: 'DOCX / LaTeX',
-    },
-    {
-      titulo: 'Informe de avance',
-      descripcion: 'Formato trimestral con bitácora y resultados parciales.',
-      formato: 'DOCX',
-    },
-    {
-      titulo: 'Documento final',
-      descripcion: 'Plantilla para el informe final y anexos del proyecto.',
-      formato: 'DOCX',
-    },
-    {
-      titulo: 'Diapositivas de sustentación',
-      descripcion: 'Guía de secciones y tiempos sugeridos para la presentación.',
-      formato: 'PPTX',
-    },
-  ];
-
-  readonly filteredPlantillas = computed(() => {
-    const term = this.search().toLowerCase();
-    return this.plantillas.filter(p => 
-      !term || p.titulo.toLowerCase().includes(term) || p.descripcion.toLowerCase().includes(term)
-    );
+  readonly faseFilter = signal<string>('');
+  readonly plantillas = computed(() => this.plantillasService.plantillas());
+  readonly templates = computed(() => {
+    let items = this.plantillas();
+    const term = this.search().trim().toLowerCase();
+    const fase = this.faseFilter();
+    if (term) items = items.filter((item) => item.nombre.toLowerCase().includes(term));
+    if (fase) items = items.filter((item) => item.fase === fase);
+    return items;
   });
 
-  getIconEmoji(formato: string): string {
-    if (formato.includes('PPTX')) return '🗂️';
-    if (formato.includes('LaTeX')) return '📄';
-    return '📋';
+  ngOnInit(): void {
+    this.loadTemplates();
   }
 
-  getIconBg(formato: string): string {
-    if (formato.includes('PPTX')) return 'bg-orange-50';
-    if (formato.includes('LaTeX')) return 'bg-green-50';
-    return 'bg-blue-50';
+  loadTemplates(): void {
+    this.plantillasService.cargar('Estudiante', undefined, undefined);
   }
 
-  getFormatoBadge(formato: string): string {
-    if (formato.includes('PPTX')) return 'bg-orange-100 text-orange-800';
-    if (formato.includes('LaTeX')) return 'bg-green-100 text-green-800';
-    return 'bg-blue-100 text-blue-800';
+  clearFilters(): void {
+    this.search.set('');
+    this.faseFilter.set('');
+  }
+
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.search.set(value);
+  }
+
+  onFaseChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.faseFilter.set(value);
+  }
+
+  downloadTemplate(template: Plantilla): void {
+    this.plantillasService.descargar(template.id);
+    this.snackBar.open('Descargando plantilla...', 'Cerrar', { duration: 2000 });
+  }
+
+  getFormatoBadge(categoria: string): string {
+    const badges: Record<string, string> = {
+      Estudiante: 'bg-blue-100 text-blue-800',
+      General: 'bg-gray-100 text-gray-800',
+      Inscripción: 'bg-blue-100 text-blue-800',
+      Aprobación: 'bg-yellow-100 text-yellow-800',
+      Desarrollo: 'bg-green-100 text-green-800',
+      Culminación: 'bg-purple-100 text-purple-800',
+      Evaluación: 'bg-orange-100 text-orange-800',
+    };
+    return badges[categoria] || 'bg-gray-100 text-gray-800';
+  }
+
+  getFaseLabel(fase: string): string {
+    const labels: Record<string, string> = {
+      INSCRIPCION: 'Inscripción',
+      APROBACION: 'Aprobación',
+      DESARROLLO: 'Desarrollo',
+      CULMINACION: 'Culminación',
+      EVALUACION: 'Evaluación',
+    };
+    return labels[fase] || fase;
+  }
+
+  getModalidadLabel(modalidad: string): string {
+    const labels: Record<string, string> = {
+      TODAS: 'Todas las modalidades',
+      INVESTIGACION: 'Solo Investigación',
+      INTERACCION_SOCIAL: 'Solo Interacción Social',
+      PASANTIA: 'Solo Pasantía',
+    };
+    return labels[modalidad] || modalidad;
+  }
+
+  formatDate(dateStr: string): string {
+    if (!dateStr) return 'N/A';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric' });
   }
 }

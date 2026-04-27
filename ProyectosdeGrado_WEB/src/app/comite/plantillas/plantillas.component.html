@@ -1,47 +1,122 @@
-<section class="templates-page">
-  <header class="hero-card templates-hero">
-    <div>
+<section class="page">
+  <header class="page-header">
+    <div class="header-content">
       <p class="eyebrow">Repositorio central</p>
-      <h1 class="templates-hero__title">
-        Plantillas
-      </h1>
-      <p class="templates-hero__subtitle">
-        El comité puede descargar, reemplazar y eliminar formatos oficiales.
-      </p>
+      <h1>Plantillas</h1>
+      <p>El comité puede subir, reemplazar y eliminar formatos oficiales (.docx) con marcadores para prellenado automático.</p>
     </div>
-    <button mat-flat-button color="primary" type="button" (click)="uploadTemplate()">Subir nueva plantilla</button>
+    <button mat-flat-button color="primary" (click)="uploadTemplate()" class="upload-btn">
+      <mat-icon>add</mat-icon>
+      Subir nueva plantilla
+    </button>
   </header>
 
-  <mat-card class="search-card">
-    <mat-card-content>
-      <div class="field">
-        <label class="field__label">Buscar plantilla</label>
-        <div class="search-wrapper">
-          <input class="field__input" type="text" placeholder="Buscar por nombre o categoría"
-            [ngModel]="search()" (ngModelChange)="search.set($event)" />
-          <mat-icon class="search-icon">search</mat-icon>
+  <section class="filters-bar" aria-label="Filtros de plantillas">
+    <mat-card>
+      <mat-card-content>
+        <div class="form-grid-3">
+          <div class="field">
+            <label class="field__label">Buscar plantillas</label>
+            <div class="field__input-wrap">
+              <input class="field__input" type="text" placeholder="Nombre de la plantilla" [value]="search()" (input)="onSearchInput($event)" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field__label">Categoría (visibilidad)</label>
+            <select class="field__select" [value]="categoriaFilter()" (change)="onCategoriaChange($event)">
+              <option value="">Todas</option>
+              <option value="Estudiante">Estudiante</option>
+              <option value="Asesor">Asesor</option>
+              <option value="Jurado">Jurado</option>
+              <option value="General">General</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="field__label">Modalidad</label>
+            <select class="field__select" [value]="modalidadFilter()" (change)="onModalidadChange($event)">
+              <option value="">Todas</option>
+              <option value="TODAS">Todas las modalidades</option>
+              <option value="INVESTIGACION">Solo Investigación</option>
+              <option value="INTERACCION_SOCIAL">Solo Interacción Social</option>
+              <option value="PASANTIA">Solo Pasantía</option>
+            </select>
+          </div>
         </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
 
-  <p class="section-label">Formatos disponibles</p>
+        @if (categoriaFilter() || modalidadFilter() || search()) {
+          <div class="filters-actions">
+            <button mat-stroked-button color="warn" (click)="clearFilters()" class="clear-filters-btn" aria-label="Limpiar filtros">
+              <mat-icon>clear</mat-icon>
+              Limpiar filtros
+            </button>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </section>
 
-  <div class="templates-grid">
+  <div class="results-info">
+    <span>{{ templates().length }} plantilla{{ templates().length !== 1 ? 's' : '' }}</span>
+  </div>
+
+  <div class="grid">
     @for (template of templates(); track template.id) {
-      <mat-card class="template-card">
+      <mat-card class="card">
         <mat-card-content>
-          <strong>{{ template.nombre }}</strong>
-          <p class="template-description">{{ template.categoria }} · {{ template.fase }}</p>
-          <p class="template-description">Aplica a: {{ template.modalidadAplica }}</p>
-          <p class="template-description">Última actualización: {{ comite.formatDate(template.ultimaActualizacion) }}</p>
+          <div class="card-header">
+            <div class="title-section">
+              <strong class="title">{{ template.nombre }}</strong>
+              <span class="badge" [ngClass]="getFormatoBadge(template.categoria)">{{ template.categoria }}</span>
+            </div>
+          </div>
+
+          <div class="meta-grid">
+            <div class="meta-item">
+              <mat-icon>timeline</mat-icon>
+              <span>Fase: {{ getFaseLabel(template.fase) }}</span>
+            </div>
+            <div class="meta-item">
+              <mat-icon>school</mat-icon>
+              <span>{{ getModalidadLabel(template.modalidad_aplica) }}</span>
+            </div>
+            <div class="meta-item">
+              <mat-icon>person</mat-icon>
+              <span>{{ template.subida_por_nombre }}</span>
+            </div>
+            <div class="meta-item">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ comite.formatDate(template.fecha_actualizacion) }}</span>
+            </div>
+          </div>
         </mat-card-content>
-        <mat-card-actions align="end">
-          <button mat-stroked-button color="primary" type="button">Descargar</button>
-          <button mat-stroked-button color="primary" type="button" (click)="replaceTemplate(template.id)">Reemplazar</button>
-          <button mat-stroked-button color="warn" type="button" (click)="deleteTemplate(template.id)">Eliminar</button>
+
+        <mat-card-actions>
+          <button mat-stroked-button color="primary" (click)="downloadTemplate(template)">
+            <mat-icon>download</mat-icon>
+            Descargar
+          </button>
+          <button mat-stroked-button color="primary" (click)="replaceTemplate(template)">
+            <mat-icon>sync</mat-icon>
+            Reemplazar
+          </button>
+          <button mat-stroked-button color="warn" (click)="deleteTemplate(template.id)">
+            <mat-icon>delete</mat-icon>
+            Eliminar
+          </button>
         </mat-card-actions>
       </mat-card>
+    } @empty {
+      <div class="empty-state">
+        <mat-icon>folder_open</mat-icon>
+        <h3>No hay plantillas</h3>
+        <p>Comienza subiendo tu primera plantilla</p>
+        <button mat-flat-button color="primary" (click)="uploadTemplate()">
+          <mat-icon>add</mat-icon>
+          Subir plantilla
+        </button>
+      </div>
     }
   </div>
 </section>

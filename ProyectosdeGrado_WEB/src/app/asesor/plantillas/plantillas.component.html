@@ -1,45 +1,92 @@
-<section class="templates-page">
+<section class="page">
   <header class="page-header">
-    <div>
-      <p class="eyebrow">Repositorio institucional</p>
-      <h1>Plantillas del asesor</h1>
-      <p>Formatos oficiales listos para descarga y futura conexión con la API de archivos.</p>
+    <div class="header-content">
+      <p class="eyebrow">Biblioteca de formatos</p>
+      <h1>Plantillas</h1>
+      <p>Descargue los formatos oficiales del programa con sus datos prellenados automáticamente.</p>
     </div>
-
-    <mat-form-field appearance="outline" class="search-field">
-      <mat-label>Buscar plantilla</mat-label>
-      <input matInput [ngModel]="search()" (ngModelChange)="search.set($event)" placeholder="Nombre del documento" />
-      <mat-icon matSuffix>search</mat-icon>
-    </mat-form-field>
   </header>
 
-  <div class="templates-grid">
-    @for (template of templates(); track template.id) {
-      <mat-card class="template-card">
-        <mat-card-content>
-          <div class="card-top">
-            <mat-chip class="category-chip">{{ template.categoria }}</mat-chip>
-            <span class="modality">{{ template.modalidadAplica }}</span>
+  <section class="filters-bar" aria-label="Filtros de plantillas">
+    <mat-card>
+      <mat-card-content>
+        <div class="form-grid-2">
+          <div class="field">
+            <label class="field__label">Buscar plantillas</label>
+            <div class="field__input-wrap">
+              <input class="field__input" type="text" placeholder="Nombre de la plantilla" [value]="search()" (input)="onSearchInput($event)" />
+            </div>
           </div>
 
-          <h3>{{ template.nombre }}</h3>
-          <p>{{ template.descripcion }}</p>
+          <div class="field">
+            <label class="field__label">Fase</label>
+            <select class="field__select" [value]="faseFilter()" (change)="onFaseChange($event)">
+              <option value="">Todas las fases</option>
+              <option value="INSCRIPCION">Inscripción</option>
+              <option value="APROBACION">Aprobación</option>
+              <option value="DESARROLLO">Desarrollo</option>
+              <option value="CULMINACION">Culminación</option>
+              <option value="EVALUACION">Evaluación</option>
+            </select>
+          </div>
+        </div>
+
+        @if (faseFilter() || search()) {
+          <div class="filters-actions">
+            <button mat-stroked-button color="warn" (click)="clearFilters()" class="clear-filters-btn" aria-label="Limpiar filtros">
+              <mat-icon>clear</mat-icon>
+              Limpiar filtros
+            </button>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </section>
+
+  <div class="results-info">
+    <span>{{ templates().length }} plantilla{{ templates().length !== 1 ? 's' : '' }}</span>
+  </div>
+
+  <div class="grid">
+    @for (template of templates(); track template.id) {
+      <mat-card class="card">
+        <mat-card-content>
+          <div class="card-header">
+            <div class="title-section">
+              <strong class="title">{{ template.nombre }}</strong>
+              <span class="badge" [ngClass]="getFormatoBadge(template.categoria)">{{ template.categoria }}</span>
+            </div>
+          </div>
+
+          <div class="meta-grid">
+            <div class="meta-item">
+              <mat-icon>timeline</mat-icon>
+              <span>Fase: {{ getFaseLabel(template.fase) }}</span>
+            </div>
+            <div class="meta-item">
+              <mat-icon>school</mat-icon>
+              <span>{{ getModalidadLabel(template.modalidad_aplica) }}</span>
+            </div>
+            <div class="meta-item">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ formatDate(template.fecha_actualizacion) }}</span>
+            </div>
+          </div>
         </mat-card-content>
 
-        <mat-card-actions align="end">
-          <button mat-flat-button color="primary" type="button" (click)="onDownload()">
+        <mat-card-actions>
+          <button mat-flat-button color="primary" (click)="downloadTemplate(template)">
             <mat-icon>download</mat-icon>
-            Descargar
+            Descargar con mis datos
           </button>
         </mat-card-actions>
       </mat-card>
     } @empty {
-      <mat-card class="empty-card">
-        <mat-card-content>
-          <h3>No hay coincidencias</h3>
-          <p>Pruebe con otro nombre o limpie la búsqueda para ver todas las plantillas.</p>
-        </mat-card-content>
-      </mat-card>
+      <div class="empty-state">
+        <mat-icon>folder_open</mat-icon>
+        <h3>No hay plantillas disponibles</h3>
+        <p>No hay plantillas asignadas a tu rol en este momento.</p>
+      </div>
     }
   </div>
 </section>
