@@ -1,21 +1,44 @@
-<section class="page">
-  <header class="page-header">
-    <div><p class="eyebrow">Repositorio central</p><h1>Plantillas</h1><p>El comité puede descargar, reemplazar y eliminar formatos oficiales.</p></div>
+<section class="templates-page">
+  <header class="hero-card templates-hero">
+    <div>
+      <p class="eyebrow">Repositorio central</p>
+      <h1 class="templates-hero__title">
+        Plantillas
+      </h1>
+      <p class="templates-hero__subtitle">
+        El comité puede descargar, reemplazar y eliminar formatos oficiales.
+      </p>
+    </div>
     <button mat-flat-button color="primary" type="button" (click)="uploadTemplate()">Subir nueva plantilla</button>
   </header>
-  <mat-form-field appearance="outline" class="search-field"><mat-label>Buscar plantilla</mat-label><input matInput [ngModel]="search()" (ngModelChange)="search.set($event)" /><mat-icon matSuffix>search</mat-icon></mat-form-field>
-  <div class="grid">
+
+  <mat-card class="search-card">
+    <mat-card-content>
+      <div class="field">
+        <label class="field__label">Buscar plantilla</label>
+        <div class="search-wrapper">
+          <input class="field__input" type="text" placeholder="Buscar por nombre o categoría"
+            [ngModel]="search()" (ngModelChange)="search.set($event)" />
+          <mat-icon class="search-icon">search</mat-icon>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <p class="section-label">Formatos disponibles</p>
+
+  <div class="templates-grid">
     @for (template of templates(); track template.id) {
-      <mat-card class="card">
+      <mat-card class="template-card">
         <mat-card-content>
           <strong>{{ template.nombre }}</strong>
-          <p>{{ template.categoria }} · {{ template.fase }}</p>
-          <p>Aplica a: {{ template.modalidadAplica }}</p>
-          <p>Última actualización: {{ comite.formatDate(template.ultimaActualizacion) }}</p>
+          <p class="template-description">{{ template.categoria }} · {{ template.fase }}</p>
+          <p class="template-description">Aplica a: {{ template.modalidadAplica }}</p>
+          <p class="template-description">Última actualización: {{ comite.formatDate(template.ultimaActualizacion) }}</p>
         </mat-card-content>
         <mat-card-actions align="end">
           <button mat-stroked-button color="primary" type="button">Descargar</button>
-          <button mat-stroked-button color="primary" type="button" (click)="replaceTemplate(template.id)">Reemplazar archivo</button>
+          <button mat-stroked-button color="primary" type="button" (click)="replaceTemplate(template.id)">Reemplazar</button>
           <button mat-stroked-button color="warn" type="button" (click)="deleteTemplate(template.id)">Eliminar</button>
         </mat-card-actions>
       </mat-card>

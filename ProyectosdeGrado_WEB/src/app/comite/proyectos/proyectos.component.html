@@ -1,5 +1,5 @@
 <section class="projects-page">
-  <header class="page-header hero-card">
+  <header class="page-header">
     <div>
       <p class="eyebrow">Gestión completa</p>
       <h1>Proyectos</h1>
@@ -8,83 +8,76 @@
     <button mat-flat-button color="primary" type="button" (click)="openCreateProject()">Registrar nuevo proyecto</button>
   </header>
 
-  <mat-card class="filters-card">
-    <mat-card-content class="filters-grid">
-      <div class="filter-field">
-        <span class="filter-field__label">Buscar</span>
-        <mat-form-field appearance="outline">
-          <mat-label>Buscar</mat-label>
-          <input matInput [value]="search()" (input)="search.set($any($event.target).value)" placeholder="Proyecto, estudiante o asesor" />
-        </mat-form-field>
-      </div>
+  <mat-card>
+    <mat-card-content>
+      <div class="form-grid-3">
+        <div class="field">
+          <label class="field__label">Buscar</label>
+          <div class="search-wrapper">
+            <input class="field__input" type="text" placeholder="Proyecto, estudiante o asesor"
+              [value]="search()" (input)="search.set($any($event.target).value)" />
+            <mat-icon class="search-icon">search</mat-icon>
+          </div>
+        </div>
 
-      <div class="filter-field">
-        <span class="filter-field__label">Modalidad</span>
-        <mat-form-field appearance="outline">
-          <mat-label>Modalidad</mat-label>
-          <mat-select [value]="modalityFilter()" (valueChange)="modalityFilter.set($event)">
-            <mat-option value="todas">Todas</mat-option>
-            <mat-option value="Investigación">Investigación</mat-option>
-            <mat-option value="Interacción Social">Interacción Social</mat-option>
-            <mat-option value="Pasantía">Pasantía</mat-option>
-            <mat-option value="Proyecto de Desarrollo de Software">Proyecto de Desarrollo de Software</mat-option>
-            <mat-option value="Proyecto de Intervención">Proyecto de Intervención</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
+        <div class="field">
+          <label class="field__label">Modalidad</label>
+          <select class="field__select" [value]="modalityFilter()"
+            (change)="modalityFilter.set($any($event.target).value)">
+            <option value="todas">Todas</option>
+            <option value="Investigación">Investigación</option>
+            <option value="Interacción Social">Interacción Social</option>
+            <option value="Pasantía">Pasantía</option>
+            <option value="Proyecto de Desarrollo de Software">Proyecto de Desarrollo de Software</option>
+            <option value="Proyecto de Intervención">Proyecto de Intervención</option>
+          </select>
+        </div>
 
-      <div class="filter-field">
-        <span class="filter-field__label">Fase</span>
-        <mat-form-field appearance="outline">
-          <mat-label>Fase</mat-label>
-          <mat-select [value]="phaseFilter()" (valueChange)="phaseFilter.set($event)">
-            <mat-option value="todas">Todas</mat-option>
-            <mat-option value="inscripcion">Inscripción</mat-option>
-            <mat-option value="aprobacion">Aprobación</mat-option>
-            <mat-option value="desarrollo">Desarrollo</mat-option>
-            <mat-option value="culminacion">Culminación</mat-option>
-            <mat-option value="evaluacion">Evaluación</mat-option>
-            <mat-option value="finalizado">Finalizado</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
+        <div class="field">
+          <label class="field__label">Fase</label>
+          <select class="field__select" [value]="phaseFilter()"
+            (change)="phaseFilter.set($any($event.target).value)">
+            <option value="todas">Todas</option>
+            <option value="inscripcion">Inscripción</option>
+            <option value="aprobacion">Aprobación</option>
+            <option value="desarrollo">Desarrollo</option>
+            <option value="culminacion">Culminación</option>
+            <option value="evaluacion">Evaluación</option>
+            <option value="finalizado">Finalizado</option>
+          </select>
+        </div>
 
-      <div class="filter-field">
-        <span class="filter-field__label">Estado</span>
-        <mat-form-field appearance="outline">
-          <mat-label>Estado</mat-label>
-          <mat-select [value]="statusFilter()" (valueChange)="statusFilter.set($event)">
-            <mat-option value="todos">Todos</mat-option>
-            <mat-option value="pendiente_revision">Pendiente revisión</mat-option>
-            <mat-option value="en_curso">En curso</mat-option>
-            <mat-option value="pendiente_jurados">Pendiente jurados</mat-option>
-            <mat-option value="pendiente_programacion">Pendiente programación</mat-option>
-            <mat-option value="pendiente_acta_final">Pendiente acta final</mat-option>
-            <mat-option value="con_prorroga">Con prórroga</mat-option>
-            <mat-option value="finalizado">Finalizado</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
+        <div class="field">
+          <label class="field__label">Estado</label>
+          <select class="field__select" [value]="statusFilter()"
+            (change)="statusFilter.set($any($event.target).value)">
+            <option value="todos">Todos</option>
+            <option value="pendiente_revision">Pendiente revisión</option>
+            <option value="en_curso">En curso</option>
+            <option value="pendiente_jurados">Pendiente jurados</option>
+            <option value="pendiente_programacion">Pendiente programación</option>
+            <option value="pendiente_acta_final">Pendiente acta final</option>
+            <option value="con_prorroga">Con prórga</option>
+            <option value="finalizado">Finalizado</option>
+          </select>
+        </div>
 
-      <div class="filter-field">
-        <span class="filter-field__label">Periodo</span>
-        <mat-form-field appearance="outline">
-          <mat-label>Periodo</mat-label>
-          <mat-select [value]="periodFilter()" (valueChange)="periodFilter.set($event)">
-            <mat-option value="todos">Todos</mat-option>
+        <div class="field">
+          <label class="field__label">Periodo</label>
+          <select class="field__select" [value]="periodFilter()"
+            (change)="periodFilter.set($any($event.target).value)">
+            <option value="todos">Todos</option>
             @for (period of comite.periodos(); track period.id) {
-              <mat-option [value]="period.nombre">{{ period.nombre }}</mat-option>
+              <option [value]="period.nombre">{{ period.nombre }}</option>
             }
-          </mat-select>
-        </mat-form-field>
-      </div>
+          </select>
+        </div>
 
-      <div class="filter-field">
-        <span class="filter-field__label">Asesor</span>
-        <mat-form-field appearance="outline">
-          <mat-label>Asesor</mat-label>
-          <input matInput [value]="advisorFilter()" (input)="advisorFilter.set($any($event.target).value)" placeholder="Nombre del asesor" />
-        </mat-form-field>
+        <div class="field">
+          <label class="field__label">Asesor</label>
+          <input class="field__input" type="text" placeholder="Nombre del asesor"
+            [value]="advisorFilter()" (input)="advisorFilter.set($any($event.target).value)" />
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

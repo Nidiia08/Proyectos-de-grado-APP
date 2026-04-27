@@ -370,6 +370,22 @@
   font-size: 13px;
 }
 
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-wrapper .field__input {
+  padding-right: 40px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  color: #9ca3af;
+}
+
 .field__hint {
   font-size: 12px;
   color: #6B7280;

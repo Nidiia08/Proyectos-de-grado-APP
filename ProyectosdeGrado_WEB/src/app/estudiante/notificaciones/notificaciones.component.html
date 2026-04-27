@@ -13,12 +13,25 @@
     }
   </header>
 
+  <mat-card class="search-card">
+    <mat-card-content>
+      <div class="field">
+        <label class="field__label">Buscar notificación</label>
+        <div class="search-wrapper">
+          <input class="field__input" type="text" placeholder="Buscar por título o descripción"
+            [ngModel]="search()" (ngModelChange)="search.set($event)" />
+          <mat-icon class="search-icon">search</mat-icon>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
   @if (noLeidas > 0) {
     <p class="section-label">Recientes</p>
   }
 
   <div class="notification-list">
-    @for (n of notificaciones; track n.titulo; let idx = $index) {
+    @for (n of filteredNotificaciones(); track n.titulo; let idx = $index) {
       @if (idx === noLeidas && noLeidas > 0) {
         <p class="section-label section-label--spaced">Anteriores</p>
       }

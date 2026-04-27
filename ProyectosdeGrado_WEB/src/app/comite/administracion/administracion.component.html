@@ -18,8 +18,11 @@
             <div class="form-grid-3">
               <div class="field">
                 <label class="field__label">Buscar usuario</label>
-                <input class="field__input" type="text" placeholder="Nombre o correo"
-                  [value]="searchUser()" (input)="searchUser.set($any($event.target).value)" />
+                <div class="search-wrapper">
+                  <input class="field__input" type="text" placeholder="Nombre o correo"
+                    [value]="searchUser()" (input)="searchUser.set($any($event.target).value)" />
+                  <mat-icon class="search-icon">search</mat-icon>
+                </div>
               </div>
               <div class="field">
                 <label class="field__label">Rol</label>

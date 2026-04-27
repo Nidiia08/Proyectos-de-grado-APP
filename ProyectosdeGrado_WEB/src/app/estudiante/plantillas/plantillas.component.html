@@ -11,10 +11,23 @@
     </div>
   </header>
 
+  <mat-card class="search-card">
+    <mat-card-content>
+      <div class="field">
+        <label class="field__label">Buscar plantilla</label>
+        <div class="search-wrapper">
+          <input class="field__input" type="text" placeholder="Buscar por nombre o categoría"
+            [ngModel]="search()" (ngModelChange)="search.set($event)" />
+          <mat-icon class="search-icon">search</mat-icon>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
   <p class="section-label">Formatos disponibles</p>
 
   <div class="templates-grid">
-    @for (p of plantillas; track p.titulo) {
+    @for (p of filteredPlantillas(); track p.titulo) {
       <article class="template-card">
         <div class="template-icon" [ngClass]="getIconBg(p.formato)">
           {{ getIconEmoji(p.formato) }}

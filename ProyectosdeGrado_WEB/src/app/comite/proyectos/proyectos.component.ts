@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { ComiteEstadoProyecto, ComiteService, ProyectoComite } from '../comite.service';
@@ -14,7 +15,7 @@ import { ProyectoDetalleComponent } from './proyecto-detalle/proyecto-detalle.co
 @Component({
   selector: 'app-comite-proyectos',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatButtonModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSelectModule, ProyectoDetalleComponent],
+  imports: [CommonModule, FormsModule, MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, ProyectoDetalleComponent],
   templateUrl: './proyectos.component.html',
   styleUrl: './proyectos.component.scss',
 })

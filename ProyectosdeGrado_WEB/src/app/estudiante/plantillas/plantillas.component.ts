@@ -1,5 +1,8 @@
 import { CommonModule, NgClass } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 
 interface PlantillaEstudiante {
   titulo: string;
@@ -10,11 +13,13 @@ interface PlantillaEstudiante {
 @Component({
   selector: 'app-estudiante-plantillas',
   standalone: true,
-  imports: [CommonModule, NgClass],
+  imports: [CommonModule, NgClass, FormsModule, MatCardModule, MatIconModule],
   templateUrl: './plantillas.component.html',
   styleUrl: './plantillas.component.scss',
 })
 export class PlantillasComponent {
+  readonly search = signal('');
+
   readonly plantillas: PlantillaEstudiante[] = [
     {
       titulo: 'Propuesta de trabajo de grado',
@@ -37,6 +42,13 @@ export class PlantillasComponent {
       formato: 'PPTX',
     },
   ];
+
+  readonly filteredPlantillas = computed(() => {
+    const term = this.search().toLowerCase();
+    return this.plantillas.filter(p => 
+      !term || p.titulo.toLowerCase().includes(term) || p.descripcion.toLowerCase().includes(term)
+    );
+  });
 
   getIconEmoji(formato: string): string {
     if (formato.includes('PPTX')) return '🗂️';
