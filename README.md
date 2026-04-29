@@ -33,21 +33,8 @@ El monorepo contiene dos aplicaciones:
 
 Este es el flujo principal y recomendado.
 
-### 1. Crear archivos de entorno
 
-Si no existen, crea estos archivos:
-
-- `.env`
-- `ProyectosdeGrado_API/.env`
-
-En Windows puedes generarlos vacios asi:
-
-```bash
-type nul > .env
-type nul > ProyectosdeGrado_API/.env
-```
-
-### 2. Levantar todo el entorno
+### 1. Levantar todo el entorno
 
 Desde la raiz del monorepo:
 
@@ -61,7 +48,7 @@ Si lo quieres en segundo plano:
 docker-compose up -d --build
 ```
 
-### 3. Verificar que quedo arriba
+### 2. Verificar que quedo arriba
 
 ```bash
 docker-compose ps
